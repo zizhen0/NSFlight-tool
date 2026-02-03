@@ -2,319 +2,87 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NS释压/飘降选择</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: "Microsoft YaHei", Arial, sans-serif;
-            padding: 15px;
+            padding: 10px;
             background: #f0f2f5;
             min-height: 100vh;
+            font-size: 14px;
         }
+        
+        /* 响应式调整 */
+        @media (max-width: 767px) {
+            body {
+                padding: 5px;
+                font-size: 13px;
+            }
+        }
+        
         .container {
             max-width: 1600px;
             margin: 0 auto;
             background: white;
             border-radius: 8px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+        
+        @media (max-width: 767px) {
+            .container {
+                padding: 10px;
+                border-radius: 6px;
+            }
+        }
+        
         .header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 15px;
             padding-bottom: 15px;
             border-bottom: 2px solid #e8eaec;
         }
+        
+        @media (min-width: 768px) {
+            .header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
         .title {
             color: #1a365d;
             font-size: 1.5rem;
             font-weight: bold;
-        }
-        .airport-pairs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f7fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-        .airport-pair {
-            padding: 8px 16px;
-            background: white;
-            border: 2px solid #38a169;
-            border-radius: 6px;
-            color: #38a169;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .airport-pair:hover {
-            background: #38a169;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(56, 161, 105, 0.3);
-        }
-        .airport-pair.selected {
-            background: #38a169;
-            color: white;
-            border-color: #2f855a;
-            box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2);
-        }
-        .airport-pair .upload-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            display: none;
-        }
-        .airport-pair.selected .upload-btn {
-            display: block;
-        }
-        .status-bar {
-            background: #edf2f7;
-            padding: 12px 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-        }
-        .stats {
-            display: flex;
-            gap: 25px;
-        }
-        .stat-item {
             text-align: center;
         }
-        .stat-value {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #2d3748;
+        
+        @media (max-width: 767px) {
+            .title {
+                font-size: 1.2rem;
+            }
         }
-        .stat-label {
-            font-size: 0.8rem;
-            color: #718096;
-            margin-top: 2px;
-        }
-        .selected-alternates {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .alternate-tag {
-            background: #38a169;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .alternate-tag .remove {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            padding: 0;
-            font-size: 1.1rem;
-            line-height: 1;
-        }
-        .data-table-container {
-            margin-top: 10px;
-            overflow-x: auto;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            background: white;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            background: white;
-        }
-        th {
-            background: #2d3748;
-            color: white;
-            padding: 12px 8px;
-            text-align: center;
-            font-weight: bold;
-            border: 1px solid #ddd;
-        }
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-            transition: background-color 0.2s;
-            background: white;
-        }
-        .release-group td {
-            border-bottom: 2px solid #ddd !important;
-            background: white;
-        }
-        .descend-group td {
-            border-bottom: 2px solid #ddd !important;
-            background: white;
-        }
-        .group-title {
-            font-weight: bold;
-            text-align: left;
-            padding-left: 20px;
-            background: #edf2f7 !important;
-            border-bottom: 3px solid #ddd !important;
-        }
-        .release-group-title {
-            color: #2f855a;
-        }
-        .descend-group-title {
-            color: #c53030;
-        }
-        .group-divider td {
-            border-bottom: 3px solid #ddd !important;
-            padding: 2px;
-            background: #edf2f7;
-        }
-        .alternate-cell {
-            cursor: pointer;
-            font-weight: bold;
-            color: #2d3748;
-            transition: all 0.2s;
-            min-width: 80px;
-            position: relative;
-            background: white;
-        }
-        .alternate-cell:hover {
-            background-color: #e6fffa !important;
-        }
-        .alternate-cell.selected {
-            background-color: #c6f6d5 !important;
-        }
-        .segment-cell {
-            background: white;
-        }
-        .segment-cell.selected {
-            background-color: #c6f6d5 !important;
-        }
-        .collapse-section {
-            margin-top: 20px;
-        }
-        .collapse-header {
-            background: #e2e8f0;
-            padding: 12px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            color: #2d3748;
-        }
-        .collapse-content {
-            padding: 15px;
-            background: #f7fafc;
-            border-radius: 0 0 6px 6px;
-            display: none;
-        }
-        .collapse-content.active {
-            display: block;
-        }
-        .import-section {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            border: 2px dashed #ddd;
-            margin-bottom: 15px;
-        }
-        .template-download {
-            margin-top: 10px;
-        }
-        .template-download a {
-            color: #3182ce;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .template-download a:hover {
-            text-decoration: underline;
-        }
-        .upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 15px;
-        }
-        .upload-area:hover {
-            border-color: #3182ce;
-            background: #f0f7ff;
-        }
-        .upload-area.drag-over {
-            border-color: #38a169;
-            background: #f0fff4;
-        }
-        .upload-icon {
-            font-size: 48px;
-            color: #718096;
-            margin-bottom: 10px;
-        }
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            background: #38a169;
-            color: white;
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            display: none;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-        }
-        .notification.show {
-            display: flex;
-            animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .program-indicator {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .release-indicator {
-            background: #c6f6d5;
-            color: #2f855a;
-        }
-        .descend-indicator {
-            background: #fed7d7;
-            color: #c53030;
-        }
+        
         .control-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
+        
+        @media (min-width: 768px) {
+            .control-buttons {
+                justify-content: flex-end;
+            }
+        }
+        
         button {
-            padding: 8px 16px;
+            padding: 8px 12px;
             border: none;
             border-radius: 4px;
             font-size: 0.9rem;
@@ -323,7 +91,16 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
         }
+        
+        @media (max-width: 767px) {
+            button {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+        }
+        
         .btn-secondary {
             background: #718096;
             color: white;
@@ -349,23 +126,437 @@
             color: white;
         }
         .btn-info:hover { background: #2c5282; }
+        
+        .drag-instructions {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 10px;
+            padding: 8px;
+            background: #f7fafc;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            display: none;
+        }
+        
+        .airport-pairs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            justify-content: center;
+        }
+        
+        @media (max-width: 767px) {
+            .airport-pairs {
+                padding: 8px;
+                gap: 6px;
+                justify-content: flex-start;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        .airport-pair {
+            padding: 8px 12px;
+            background: white;
+            border: 2px solid #38a169;
+            border-radius: 6px;
+            color: #38a169;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            max-width: 200px;
+        }
+        
+        @media (max-width: 767px) {
+            .airport-pair {
+                padding: 6px 10px;
+                font-size: 0.9rem;
+                min-width: 120px;
+                justify-content: center;
+            }
+        }
+        
+        .airport-pair:hover {
+            background: #38a169;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(56, 161, 105, 0.3);
+        }
+        .airport-pair.selected {
+            background: #38a169;
+            color: white;
+            border-color: #2f855a;
+            box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2);
+        }
+        .airport-pair .upload-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: none;
+        }
+        .airport-pair.selected .upload-btn {
+            display: block;
+        }
+        
+        .status-bar {
+            background: #edf2f7;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        @media (min-width: 768px) {
+            .status-bar {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        @media (max-width: 767px) {
+            .stats {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: space-around;
+            }
+        }
+        
+        .stat-item {
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        @media (max-width: 767px) {
+            .stat-item {
+                min-width: 70px;
+            }
+        }
+        
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        @media (max-width: 767px) {
+            .stat-value {
+                font-size: 1.1rem;
+            }
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 2px;
+        }
+        
+        .selected-alternates {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+        
+        @media (min-width: 768px) {
+            .selected-alternates {
+                justify-content: flex-end;
+            }
+        }
+        
+        .alternate-tag {
+            background: #38a169;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        
+        .alternate-tag .remove {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+        
+        .data-table-container {
+            margin-top: 10px;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: white;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        @media (max-width: 767px) {
+            .data-table-container {
+                border-radius: 6px;
+                margin-left: -5px;
+                margin-right: -5px;
+                width: calc(100% + 10px);
+            }
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: white;
+            min-width: 400px;
+        }
+        
+        @media (max-width: 767px) {
+            table {
+                font-size: 0.85rem;
+            }
+        }
+        
+        th {
+            background: #2d3748;
+            color: white;
+            padding: 10px 6px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 767px) {
+            th {
+                padding: 8px 4px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        td {
+            border: 1px solid #ddd;
+            padding: 8px 6px;
+            text-align: center;
+            transition: background-color 0.2s;
+            background: white;
+            min-width: 60px;
+        }
+        
+        @media (max-width: 767px) {
+            td {
+                padding: 6px 4px;
+                min-width: 50px;
+            }
+        }
+        
+        .release-group td {
+            border-bottom: 2px solid #ddd !important;
+            background: white;
+        }
+        .descend-group td {
+            border-bottom: 2px solid #ddd !important;
+            background: white;
+        }
+        .group-title {
+            font-weight: bold;
+            text-align: left;
+            padding-left: 15px;
+            background: #edf2f7 !important;
+            border-bottom: 3px solid #ddd !important;
+        }
+        
+        @media (max-width: 767px) {
+            .group-title {
+                padding-left: 10px;
+            }
+        }
+        
+        .release-group-title {
+            color: #2f855a;
+        }
+        .descend-group-title {
+            color: #c53030;
+        }
+        .group-divider td {
+            border-bottom: 3px solid #ddd !important;
+            padding: 2px;
+            background: #edf2f7;
+        }
+        .alternate-cell {
+            cursor: pointer;
+            font-weight: bold;
+            color: #2d3748;
+            transition: all 0.2s;
+            position: relative;
+            background: white;
+        }
+        .alternate-cell:hover {
+            background-color: #e6fffa !important;
+        }
+        .alternate-cell.selected {
+            background-color: #c6f6d5 !important;
+        }
+        .segment-cell {
+            background: white;
+        }
+        .segment-cell.selected {
+            background-color: #c6f6d5 !important;
+        }
+        
+        tr:hover td {
+            background-color: #f7fafc !important;
+        }
+        
+        .collapse-section {
+            margin-top: 20px;
+        }
+        .collapse-header {
+            background: #e2e8f0;
+            padding: 12px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: #2d3748;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 767px) {
+            .collapse-header {
+                padding: 10px 12px;
+                font-size: 0.95rem;
+            }
+        }
+        
+        .collapse-content {
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 0 0 6px 6px;
+            display: none;
+        }
+        
+        @media (max-width: 767px) {
+            .collapse-content {
+                padding: 12px;
+            }
+        }
+        
+        .collapse-content.active {
+            display: block;
+        }
+        
+        /* 密码区域 */
+        .password-section {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        
+        @media (max-width: 767px) {
+            .password-section {
+                padding: 12px;
+            }
+        }
+        
+        .password-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .password-input-group {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+        
+        .password-input-group input {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            width: 200px;
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        
+        @media (max-width: 767px) {
+            .password-input-group input {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+        
+        /* 数据管理内容 */
+        .locked-content {
+            display: none;
+        }
+        .unlocked-content {
+            display: block;
+        }
+        
+        /* 机场对管理 */
         .pair-management {
             background: #f0f7ff;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 15px;
         }
+        
         .pair-input-group {
             display: flex;
+            flex-direction: column;
             gap: 10px;
             margin-bottom: 10px;
         }
+        
+        @media (min-width: 768px) {
+            .pair-input-group {
+                flex-direction: row;
+            }
+        }
+        
         .pair-input-group input {
             flex: 1;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            font-size: 0.9rem;
         }
+        
         .pairs-list {
             max-height: 300px;
             overflow-y: auto;
@@ -374,17 +565,28 @@
             padding: 10px;
             background: white;
         }
+        
         .pair-item {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
             padding: 8px 10px;
             background: white;
             border-radius: 4px;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             border: 1px solid #e2e8f0;
             transition: all 0.2s;
         }
+        
+        @media (min-width: 768px) {
+            .pair-item {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 0;
+            }
+        }
+        
         .pair-item:hover {
             background: #f7fafc;
             border-color: #cbd5e0;
@@ -410,88 +612,26 @@
             display: flex;
             gap: 5px;
         }
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-        .template-section {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border: 1px solid #ddd;
-        }
-        .template-preview {
-            background: white;
-            padding: 15px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            font-family: monospace;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            margin-top: 10px;
-            overflow-x: auto;
-        }
-        .template-header {
-            color: #3182ce;
-            font-weight: bold;
-        }
-        .template-row {
-            color: #2d3748;
-        }
-        .download-buttons {
+        
+        .sort-controls {
             display: flex;
+            flex-direction: column;
             gap: 10px;
-            margin-top: 15px;
-        }
-        .template-note {
-            background: #f0fff4;
+            margin-top: 10px;
             padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 0.85rem;
-            color: #2f855a;
-            border: 1px solid #ddd;
-        }
-        .password-section {
             background: #f7fafc;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            border-radius: 6px;
             border: 1px solid #e2e8f0;
-            text-align: center;
         }
-        .password-input-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 15px;
+        
+        @media (min-width: 768px) {
+            .sort-controls {
+                flex-direction: row;
+                align-items: center;
+            }
         }
-        .password-input-group input {
-            padding: 8px 12px;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
-            width: 200px;
-            font-size: 1rem;
-            text-align: center;
-            letter-spacing: 2px;
-        }
-        .locked-content {
-            display: none;
-        }
-        .unlocked-content {
-            display: block;
-        }
+        
+        /* 拖拽手柄 */
         .airport-pair .drag-handle {
             cursor: move;
             margin-right: 5px;
@@ -511,42 +651,37 @@
             border-style: dashed;
             border-color: #3182ce;
         }
-        .sort-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            padding: 10px;
-            background: #f7fafc;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-        .drag-instructions {
-            font-size: 0.85rem;
-            color: #718096;
-            margin-top: 10px;
-            padding: 8px;
-            background: #f7fafc;
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
-        }
-        .drag-instructions ul {
-            margin: 5px 0 5px 20px;
-        }
-        .drag-instructions li {
-            margin-bottom: 3px;
-        }
+        
+        /* 数据同步区域 */
         .sync-section {
             margin-top: 20px;
-            padding: 20px;
+            padding: 15px;
             background: #f0f7ff;
             border-radius: 8px;
             border: 1px solid #ddd;
         }
+        
         .sync-options {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
+        
+        .sync-options button {
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+        }
+        
+        @media (max-width: 767px) {
+            .sync-options button {
+                padding: 8px 12px;
+            }
+        }
+        
+        /* 备份提醒 */
         .backup-note {
             background: #fffaf0;
             padding: 12px;
@@ -555,7 +690,211 @@
             margin-top: 15px;
             font-size: 0.9rem;
             color: #9c4221;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
+        
+        @media (min-width: 768px) {
+            .backup-note {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
+        /* 模板区域 */
+        .template-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+        }
+        
+        .template-preview {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-family: monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+        
+        .template-header {
+            color: #3182ce;
+            font-weight: bold;
+        }
+        .template-row {
+            color: #2d3748;
+        }
+        
+        .download-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .download-buttons {
+                flex-direction: row;
+            }
+        }
+        
+        .template-note {
+            background: #f0fff4;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #2f855a;
+            border: 1px solid #ddd;
+        }
+        
+        /* 数据导入区域 */
+        .import-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px dashed #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 767px) {
+            .upload-area {
+                padding: 15px;
+            }
+        }
+        
+        .upload-area:hover {
+            border-color: #3182ce;
+            background: #f0f7ff;
+        }
+        .upload-area.drag-over {
+            border-color: #38a169;
+            background: #f0fff4;
+        }
+        .upload-icon {
+            font-size: 40px;
+            color: #718096;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 767px) {
+            .upload-icon {
+                font-size: 32px;
+            }
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        /* 批量操作区域 */
+        .batch-operations {
+            margin-top: 15px;
+        }
+        
+        .batch-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        @media (min-width: 768px) {
+            .batch-buttons {
+                flex-direction: row;
+            }
+        }
+        
+        /* 通知 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: #38a169;
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            max-width: 300px;
+            word-break: break-word;
+        }
+        
+        @media (max-width: 767px) {
+            .notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                text-align: center;
+            }
+        }
+        
+        .notification.show {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @media (max-width: 767px) {
+            @keyframes slideIn {
+                from { transform: translateY(-20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        }
+        
+        /* 程序指示器 */
+        .program-indicator {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .release-indicator {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+        .descend-indicator {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        /* 模态框 */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -567,16 +906,24 @@
             justify-content: center;
             align-items: center;
             z-index: 10000;
+            padding: 10px;
         }
         .modal-content {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             max-width: 600px;
-            width: 90%;
+            width: 100%;
             max-height: 80vh;
             overflow-y: auto;
         }
+        
+        @media (max-width: 767px) {
+            .modal-content {
+                padding: 12px;
+            }
+        }
+        
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -586,6 +933,7 @@
         .modal-title {
             margin: 0;
             color: #2d3748;
+            font-size: 1.2rem;
         }
         .modal-close {
             background: none;
@@ -601,7 +949,7 @@
         }
         .backup-textarea {
             width: 100%;
-            height: 300px;
+            height: 200px;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -610,29 +958,112 @@
             resize: vertical;
             margin-bottom: 15px;
         }
+        
+        @media (min-width: 768px) {
+            .backup-textarea {
+                height: 300px;
+            }
+        }
+        
         .modal-actions {
             display: flex;
+            flex-direction: column;
             gap: 10px;
-            justify-content: flex-end;
         }
-        tr:hover td {
-            background-color: #f7fafc !important;
+        
+        @media (min-width: 768px) {
+            .modal-actions {
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+        }
+        
+        /* 设备检测提示 */
+        .device-hint {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: #3182ce;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            opacity: 0.7;
+            z-index: 999;
+            display: none;
+        }
+        
+        @media (max-width: 767px) {
+            .device-hint {
+                display: block;
+            }
+        }
+        
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .device-hint {
+                display: block;
+                background: #38a169;
+            }
+        }
+        
+        /* 列数指示器 */
+        .columns-info {
+            background: #e6fffa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #2f855a;
+            border: 1px solid #c6f6d5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .columns-count {
+            background: #38a169;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        /* 新的ALTN列名样式 */
+        .aln-header {
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+        
+        @media (max-width: 767px) {
+            .aln-header {
+                font-size: 0.8rem;
+                letter-spacing: 0.3px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="device-hint" id="deviceHint">
+        当前设备: <span id="deviceType">电脑</span>
+    </div>
+    
     <div class="container">
         <div class="header">
             <div class="title">NS释压/飘降选择</div>
             <div class="control-buttons">
                 <button class="btn-info" onclick="togglePairOrderMode()" id="orderModeBtn">
-                    🔄 调整机场对顺序
+                    <span class="icon">🔄</span>
+                    <span class="text">调整顺序</span>
                 </button>
-                <button class="btn-secondary" onclick="clearAllHighlights()">🗑️ 清除高亮</button>
+                <button class="btn-secondary" onclick="clearAllHighlights()">
+                    <span class="icon">🗑️</span>
+                    <span class="text">清除高亮</span>
+                </button>
             </div>
         </div>
         
-        <div class="drag-instructions" id="dragInstructions" style="display: none;">
+        <div class="drag-instructions" id="dragInstructions">
             <strong>📋 拖拽排序说明：</strong>
             <ul>
                 <li>拖动机场对按钮可调整显示顺序</li>
@@ -659,6 +1090,10 @@
                     <div class="stat-value" id="currentPairName">-</div>
                     <div class="stat-label">当前机场对</div>
                 </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="maxAlternatesCount">5</div>
+                    <div class="stat-label">最大备降场数</div>
+                </div>
             </div>
             <div class="selected-alternates" id="selectedAlternatesContainer">
                 <!-- 已选备降场标签会动态显示在这里 -->
@@ -666,16 +1101,15 @@
         </div>
         
         <div class="data-table-container">
+            <div id="columnsInfo" class="columns-info" style="display: none;">
+                <span>📊 当前表格列数:</span>
+                <span class="columns-count" id="currentColumnsCount">5</span>
+                <span>备降场列（根据上传数据动态调整）</span>
+            </div>
+            
             <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th width="20%">航段</th>
-                        <th width="16%">航路备降场1</th>
-                        <th width="16%">航路备降场2</th>
-                        <th width="16%">航路备降场3</th>
-                        <th width="16%">航路备降场4</th>
-                        <th width="16%">航路备降场5</th>
-                    </tr>
+                <thead id="tableHeader">
+                    <!-- 表头会动态生成 -->
                 </thead>
                 <tbody id="tableBody">
                     <!-- 数据行将通过JS动态生成 -->
@@ -713,8 +1147,14 @@
                         </div>
                         
                         <div class="sort-controls" id="listSortControls" style="display: none;">
-                            <button class="btn-info" onclick="savePairOrder()">💾 保存当前顺序</button>
-                            <button class="btn-secondary" onclick="cancelPairOrder()">❌ 取消排序</button>
+                            <button class="btn-info" onclick="savePairOrder()">
+                                <span class="icon">💾</span>
+                                <span class="text">保存当前顺序</span>
+                            </button>
+                            <button class="btn-secondary" onclick="cancelPairOrder()">
+                                <span class="icon">❌</span>
+                                <span class="text">取消排序</span>
+                            </button>
                         </div>
                         
                         <div id="pairsList" class="pairs-list">
@@ -732,24 +1172,28 @@
                             </p>
                             
                             <div class="sync-options">
-                                <button class="btn-success" onclick="exportAllData()" style="text-align: left; display: flex; align-items: center; gap: 8px;">
-                                    <span>📤 导出所有数据 (JSON文件)</span>
-                                    <small style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">推荐使用</small>
+                                <button class="btn-success" onclick="exportAllData()">
+                                    <span class="icon">📤</span>
+                                    <span class="text">导出所有数据 (JSON文件)</span>
+                                    <small class="recommended">推荐使用</small>
                                 </button>
                                 
-                                <button class="btn-warning" onclick="importData()" style="text-align: left; display: flex; align-items: center; gap: 8px;">
-                                    <span>📥 导入数据文件</span>
-                                    <small style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">.json格式</small>
+                                <button class="btn-warning" onclick="importData()">
+                                    <span class="icon">📥</span>
+                                    <span class="text">导入数据文件</span>
+                                    <small class="format">.json格式</small>
                                 </button>
                                 
-                                <button class="btn-info" onclick="generateBackupCode()" style="text-align: left; display: flex; align-items: center; gap: 8px;">
-                                    <span>📋 生成备份代码</span>
-                                    <small style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">文本格式</small>
+                                <button class="btn-info" onclick="generateBackupCode()">
+                                    <span class="icon">📋</span>
+                                    <span class="text">生成备份代码</span>
+                                    <small class="format">文本格式</small>
                                 </button>
                                 
-                                <button class="btn-secondary" onclick="importFromText()" style="text-align: left; display: flex; align-items: center; gap: 8px;">
-                                    <span>📝 从文本导入</span>
-                                    <small style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">粘贴备份代码</small>
+                                <button class="btn-secondary" onclick="importFromText()">
+                                    <span class="icon">📝</span>
+                                    <span class="text">从文本导入</span>
+                                    <small class="format">粘贴备份代码</small>
                                 </button>
                                 
                                 <div style="margin-top: 10px; padding: 10px; background: #fff; border-radius: 6px; border: 1px solid #e2e8f0;">
@@ -766,9 +1210,11 @@
                     </div>
                     
                     <div class="backup-note">
-                        <strong>💾 备份提醒：</strong>
-                        <span id="lastBackupInfo">从未备份</span>
-                        <button onclick="exportAllData()" style="margin-left: 10px; padding: 4px 8px; background: #38a169; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
+                        <div>
+                            <strong>💾 备份提醒：</strong>
+                            <span id="lastBackupInfo">从未备份</span>
+                        </div>
+                        <button onclick="exportAllData()" style="padding: 6px 12px; background: #38a169; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
                             立即备份
                         </button>
                     </div>
@@ -778,48 +1224,51 @@
                         <h4 style="margin-bottom: 15px; color: #2d3748;">数据导入模板</h4>
                         
                         <div style="margin-bottom: 20px;">
-                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
                                 <span class="program-indicator release-indicator">释压模板</span>
-                                <span>CSV格式（UTF-8编码）：</span>
+                                <span>CSV格式（UTF-8编码）：支持1-10个备降场</span>
                             </div>
                             <div class="template-preview">
-                                <div class="template-header">航段,航路备降场1,航路备降场2,航路备降场3,航路备降场4,航路备降场5</div>
-                                <div class="template-row">航段-01,PEK,SHA,CAN,SZX,XIY</div>
-                                <div class="template-row">航段-02,PVG,CTU,KMG,URC,HRB</div>
-                                <div class="template-row">航段-03,CAN,SZX,CTU,XIY,TAO</div>
+                                <div class="template-header">航段,ALTN1,ALTN2,ALTN3,ALTN4,ALTN5,ALTN6,ALTN7,ALTN8,ALTN9,ALTN10</div>
+                                <div class="template-row">航段-01,PEK,SHA,CAN,SZX,XIY,CTU,KMG,URC,HRB,DLC</div>
+                                <div class="template-row">航段-02,PVG,CTU,KMG,URC,HRB,SHA,PEK,CAN,SZX,XIY</div>
+                                <div class="template-row">航段-03,CAN,SZX,CTU,XIY,TAO,PVG,KMG,URC,HRB,PEK</div>
                             </div>
                             
                             <div style="margin-bottom: 20px; margin-top: 20px;">
-                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
                                     <span class="program-indicator descend-indicator">飘降模板</span>
-                                    <span>CSV格式（UTF-8编码）：</span>
+                                    <span>CSV格式（UTF-8编码）：支持1-10个备降场</span>
                                 </div>
                                 <div class="template-preview">
-                                    <div class="template-header">航段,航路备降场1,航路备降场2,航路备降场3,航路备降场4,航路备降场5</div>
-                                    <div class="template-row">航段-04,SZX,CTU,KMG,URC,HRB</div>
-                                    <div class="template-row">航段-05,CTU,PEK,SHA,CAN,SZX</div>
-                                    <div class="template-row">航段-06,XIY,CKG,KWE,WUH,CSX</div>
+                                    <div class="template-header">航段,ALTN1,ALTN2,ALTN3,ALTN4,ALTN5,ALTN6,ALTN7,ALTN8,ALTN9,ALTN10</div>
+                                    <div class="template-row">航段-04,SZX,CTU,KMG,URC,HRB,PEK,SHA,CAN,XIY,TAO</div>
+                                    <div class="template-row">航段-05,CTU,PEK,SHA,CAN,SZX,XIY,KMG,URC,HRB,PVG</div>
+                                    <div class="template-row">航段-06,XIY,CKG,KWE,WUH,CSX,CTU,SZX,CAN,PEK,SHA</div>
                                 </div>
                             </div>
                             
                             <div class="download-buttons">
                                 <button class="btn-success" onclick="downloadReleaseTemplate()">
-                                    📥 下载释压模板
+                                    <span class="icon">📥</span>
+                                    <span class="text">下载释压模板</span>
                                 </button>
                                 <button class="btn-danger" onclick="downloadDescendTemplate()">
-                                    📥 下载飘降模板
+                                    <span class="icon">📥</span>
+                                    <span class="text">下载飘降模板</span>
                                 </button>
                                 <button class="btn-warning" onclick="downloadCombinedTemplate()">
-                                    📥 下载完整模板
+                                    <span class="icon">📥</span>
+                                    <span class="text">下载完整模板</span>
                                 </button>
                             </div>
                             
                             <div class="template-note">
                                 <strong>📋 使用说明：</strong><br>
-                                1. 请下载对应模板，使用Excel或文本编辑器编辑<br>
+                                1. 支持1-10个备降场列，系统自动识别列数<br>
                                 2. 严格按照模板格式填写，不要修改表头<br>
                                 3. 保存为CSV格式（UTF-8编码）后导入<br>
-                                4. 文件名建议：机场对_程序类型.csv（例如：石家庄-大兴_释压.csv）
+                                4. 系统会根据所有数据中的最大备降场数动态调整表格列数
                             </div>
                         </div>
                     </div>
@@ -839,7 +1288,8 @@
                                 <input type="file" id="fileInput" accept=".csv" multiple onchange="handleFileSelect()">
                             </div>
                             <div style="font-size: 0.85rem; color: #718096; margin-top: 15px;">
-                                <strong>注意：</strong>请分别上传释压和飘降的CSV文件<br>
+                                <strong>注意：</strong>支持1-10个备降场列，系统自动识别<br>
+                                备降场列名格式：ALTN1, ALTN2, ALTN3...<br>
                                 文件名建议：<span style="color: #38a169;">[机场对]_[程序].csv</span><br>
                                 例如：石家庄-大兴_释压.csv
                             </div>
@@ -847,20 +1297,23 @@
                         
                         <div style="margin-top: 15px;">
                             <button class="btn-danger" onclick="clearCurrentPairData()" style="width: 100%;">
-                                🗑️ 清空当前机场对数据
+                                <span class="icon">🗑️</span>
+                                <span class="text">清空当前机场对数据</span>
                             </button>
                         </div>
                     </div>
                     
                     <!-- 批量操作 -->
-                    <div style="margin-top: 15px;">
+                    <div class="batch-operations">
                         <h4 style="margin-bottom: 10px; color: #2d3748;">批量操作</h4>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn-success" onclick="loadAllSampleData()" style="flex: 1;">
-                                📋 加载所有示例数据
+                        <div class="batch-buttons">
+                            <button class="btn-success" onclick="loadAllSampleData()">
+                                <span class="icon">📋</span>
+                                <span class="text">加载所有示例数据</span>
                             </button>
-                            <button class="btn-danger" onclick="clearAllData()" style="flex: 1;">
-                                🗑️ 清空所有机场对数据
+                            <button class="btn-danger" onclick="clearAllData()">
+                                <span class="icon">🗑️</span>
+                                <span class="text">清空所有机场对数据</span>
                             </button>
                         </div>
                     </div>
@@ -881,6 +1334,9 @@
         let currentPair = null;
         let selectedAlternates = new Set();
         
+        // 全局最大备降场数量
+        let maxAlternatesCount = 5; // 默认5个，但会自动调整
+        
         // 拖拽排序相关变量
         let isReorderMode = false;
         let draggedItem = null;
@@ -892,7 +1348,43 @@
         const PASSWORD = "28420";
         
         // 数据版本
-        const DATA_VERSION = "2.0";
+        const DATA_VERSION = "3.0"; // 升级版本以支持自适应列数
+        
+        // 设备检测
+        function detectDevice() {
+            const width = window.innerWidth;
+            let deviceType = "电脑";
+            
+            if (width < 768) {
+                deviceType = "手机";
+            } else if (width >= 768 && width <= 1024) {
+                deviceType = "平板";
+            }
+            
+            document.getElementById('deviceType').textContent = deviceType;
+            return deviceType;
+        }
+        
+        // 调整界面适应设备
+        function adjustUIForDevice() {
+            const device = detectDevice();
+            const isMobile = device === "手机";
+            
+            // 调整表格滚动
+            if (isMobile) {
+                // 手机端优化
+                document.body.style.fontSize = '13px';
+                // 隐藏部分按钮文字，只显示图标
+                const buttons = document.querySelectorAll('button .text');
+                buttons.forEach(btn => {
+                    if (btn.textContent.includes('调整顺序')) {
+                        btn.textContent = '顺序';
+                    } else if (btn.textContent.includes('清除高亮')) {
+                        btn.textContent = '清除';
+                    }
+                });
+            }
+        }
         
         // 初始化示例数据
         function initSampleData() {
@@ -905,6 +1397,7 @@
                     release: [],
                     descend: [],
                     selectedAlternates: new Set(),
+                    maxAlternates: 5, // 记录每个机场对的最大备降场数
                     nextId: 1
                 };
             });
@@ -917,12 +1410,72 @@
             
             renderAirportPairs();
             if (currentPair) {
+                // 计算全局最大备降场数
+                calculateMaxAlternatesCount();
+                renderTableHeader();
                 renderTable();
                 updateStats();
             }
             saveAllData();
             updateLastBackupInfo();
             showNotification('示例数据已初始化');
+        }
+        
+        // 计算全局最大备降场数
+        function calculateMaxAlternatesCount() {
+            let maxCount = 5; // 默认最小值
+            
+            Object.keys(allData).forEach(pair => {
+                const pairData = allData[pair];
+                let pairMax = 0;
+                
+                // 检查释压数据
+                pairData.release.forEach(row => {
+                    // 计算该行实际有效的备降场数量
+                    let count = 0;
+                    for (let i = 1; i <= 10; i++) {
+                        const key = `alternate${i}`;
+                        if (row[key] && row[key].trim() !== '') {
+                            count = i; // 更新最大列数
+                        }
+                    }
+                    if (count > pairMax) pairMax = count;
+                });
+                
+                // 检查飘降数据
+                pairData.descend.forEach(row => {
+                    let count = 0;
+                    for (let i = 1; i <= 10; i++) {
+                        const key = `alternate${i}`;
+                        if (row[key] && row[key].trim() !== '') {
+                            count = i;
+                        }
+                    }
+                    if (count > pairMax) pairMax = count;
+                });
+                
+                // 更新该机场对的最大备降场数
+                allData[pair].maxAlternates = Math.max(5, pairMax);
+                
+                // 更新全局最大值
+                if (allData[pair].maxAlternates > maxCount) {
+                    maxCount = allData[pair].maxAlternates;
+                }
+            });
+            
+            maxAlternatesCount = maxCount;
+            document.getElementById('maxAlternatesCount').textContent = maxAlternatesCount;
+            document.getElementById('currentColumnsCount').textContent = maxAlternatesCount;
+            
+            // 显示列数信息
+            const columnsInfo = document.getElementById('columnsInfo');
+            if (maxAlternatesCount > 5) {
+                columnsInfo.style.display = 'flex';
+            } else {
+                columnsInfo.style.display = 'none';
+            }
+            
+            return maxCount;
         }
         
         // 检查密码
@@ -975,32 +1528,90 @@
             return false;
         }
         
-        // 加载机场对的示例数据（修正后的版本）
+        // 加载机场对的示例数据
         function loadPairSampleData(pairName) {
             if (!allData[pairName]) {
                 allData[pairName] = {
                     release: [],
                     descend: [],
                     selectedAlternates: new Set(),
+                    maxAlternates: 5,
                     nextId: 1
                 };
             }
             
-            // 释压示例数据
+            // 释压示例数据 - 增加到7个备降场作为示例
             allData[pairName].release = [
-                { id: 1, segment: `${pairName}-释压-01`, alternate1: 'PEK', alternate2: 'SHA', alternate3: 'CAN', alternate4: 'SZX', alternate5: 'XIY' },
-                { id: 2, segment: `${pairName}-释压-02`, alternate1: 'PVG', alternate2: 'CTU', alternate3: 'KMG', alternate4: 'URC', alternate5: 'HRB' },
-                { id: 3, segment: `${pairName}-释压-03`, alternate1: 'CAN', alternate2: 'SZX', alternate3: 'CTU', alternate4: 'XIY', alternate5: 'TAO' }
+                { 
+                    id: 1, 
+                    segment: `${pairName}-释压-01`, 
+                    alternate1: 'PEK', alternate2: 'SHA', alternate3: 'CAN', 
+                    alternate4: 'SZX', alternate5: 'XIY', alternate6: 'CTU', 
+                    alternate7: 'KMG', alternate8: '', alternate9: '', alternate10: ''
+                },
+                { 
+                    id: 2, 
+                    segment: `${pairName}-释压-02`, 
+                    alternate1: 'PVG', alternate2: 'CTU', alternate3: 'KMG', 
+                    alternate4: 'URC', alternate5: 'HRB', alternate6: 'SHA', 
+                    alternate7: 'PEK', alternate8: 'CAN', alternate9: 'SZX', alternate10: 'XIY'
+                },
+                { 
+                    id: 3, 
+                    segment: `${pairName}-释压-03`, 
+                    alternate1: 'CAN', alternate2: 'SZX', alternate3: 'CTU', 
+                    alternate4: 'XIY', alternate5: 'TAO', alternate6: 'PVG', 
+                    alternate7: 'KMG', alternate8: 'URC', alternate9: 'HRB', alternate10: 'PEK'
+                }
             ];
             
-            // 飘降示例数据
+            // 飘降示例数据 - 增加到8个备降场作为示例
             allData[pairName].descend = [
-                { id: 4, segment: `${pairName}-飘降-01`, alternate1: 'SZX', alternate2: 'CTU', alternate3: 'KMG', alternate4: 'URC', alternate5: 'HRB' },
-                { id: 5, segment: `${pairName}-飘降-02`, alternate1: 'CTU', alternate2: 'PEK', alternate3: 'SHA', alternate4: 'CAN', alternate5: 'SZX' },
-                { id: 6, segment: `${pairName}-飘降-03`, alternate1: 'XIY', alternate2: 'CKG', alternate3: 'KWE', alternate4: 'WUH', alternate5: 'CSX' }
+                { 
+                    id: 4, 
+                    segment: `${pairName}-飘降-01`, 
+                    alternate1: 'SZX', alternate2: 'CTU', alternate3: 'KMG', 
+                    alternate4: 'URC', alternate5: 'HRB', alternate6: 'PEK', 
+                    alternate7: 'SHA', alternate8: 'CAN', alternate9: 'XIY', alternate10: 'TAO'
+                },
+                { 
+                    id: 5, 
+                    segment: `${pairName}-飘降-02`, 
+                    alternate1: 'CTU', alternate2: 'PEK', alternate3: 'SHA', 
+                    alternate4: 'CAN', alternate5: 'SZX', alternate6: 'XIY', 
+                    alternate7: 'KMG', alternate8: 'URC', alternate9: 'HRB', alternate10: 'PVG'
+                },
+                { 
+                    id: 6, 
+                    segment: `${pairName}-飘降-03`, 
+                    alternate1: 'XIY', alternate2: 'CKG', alternate3: 'KWE', 
+                    alternate4: 'WUH', alternate5: 'CSX', alternate6: 'CTU', 
+                    alternate7: 'SZX', alternate8: 'CAN', alternate9: 'PEK', alternate10: 'SHA'
+                }
             ];
             
             allData[pairName].nextId = 7;
+            allData[pairName].maxAlternates = 10; // 示例数据中有10个备降场
+        }
+        
+        // 渲染表格表头（根据最大备降场数量动态生成）
+        function renderTableHeader() {
+            const tableHeader = document.getElementById('tableHeader');
+            if (!tableHeader) return;
+            
+            let headerHTML = '<tr>';
+            headerHTML += '<th width="20%">航段</th>';
+            
+            // 根据最大备降场数量生成表头 - 使用ALTN格式
+            const segmentWidth = 20;
+            const alternateWidth = (100 - segmentWidth) / maxAlternatesCount;
+            
+            for (let i = 1; i <= maxAlternatesCount; i++) {
+                headerHTML += `<th width="${alternateWidth}%" class="aln-header">ALTN${i}</th>`;
+            }
+            
+            headerHTML += '</tr>';
+            tableHeader.innerHTML = headerHTML;
         }
         
         // 渲染机场对按钮
@@ -1018,7 +1629,7 @@
                     // 排序模式：显示拖拽手柄，可拖拽
                     pairElement.innerHTML = `
                         <span class="drag-handle" draggable="true" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)">☰</span>
-                        ${pair}
+                        <span class="pair-name">${pair}</span>
                         <button class="upload-btn" onclick="event.stopPropagation(); uploadForPair('${pair}')">上传</button>
                     `;
                     
@@ -1031,7 +1642,7 @@
                 } else {
                     // 正常模式
                     pairElement.innerHTML = `
-                        ${pair}
+                        <span class="pair-name">${pair}</span>
                         <button class="upload-btn" onclick="event.stopPropagation(); uploadForPair('${pair}')">上传</button>
                     `;
                     pairElement.onclick = () => selectAirportPair(pair);
@@ -1055,7 +1666,7 @@
             container.innerHTML = '';
             
             airportPairs.forEach((pair, index) => {
-                const pairData = allData[pair] || { release: [], descend: [] };
+                const pairData = allData[pair] || { release: [], descend: [], maxAlternates: 5 };
                 const totalSegments = pairData.release.length + pairData.descend.length;
                 
                 const div = document.createElement('div');
@@ -1078,7 +1689,7 @@
                         <div>
                             <strong>${pair}</strong>
                             <span style="font-size: 0.8rem; color: #718096; margin-left: 10px;">
-                                (释压: ${pairData.release.length} | 飘降: ${pairData.descend.length})
+                                (释压: ${pairData.release.length} | 飘降: ${pairData.descend.length} | 备降场: ${pairData.maxAlternates || 5})
                             </span>
                         </div>
                     </div>
@@ -1104,12 +1715,16 @@
                     release: [],
                     descend: [],
                     selectedAlternates: new Set(),
+                    maxAlternates: 5,
                     nextId: 1
                 };
                 selectedAlternates = new Set();
             }
             
             renderAirportPairs();
+            // 重新计算最大备降场数
+            calculateMaxAlternatesCount();
+            renderTableHeader();
             renderTable();
             updateStats();
             showNotification(`已切换到机场对：${pair}`);
@@ -1125,7 +1740,7 @@
             
             if (isReorderMode) {
                 // 进入排序模式
-                orderBtn.innerHTML = '✅ 完成排序';
+                orderBtn.innerHTML = '<span class="icon">✅</span><span class="text">完成排序</span>';
                 orderBtn.classList.remove('btn-info');
                 orderBtn.classList.add('btn-success');
                 dragInstructions.style.display = 'block';
@@ -1137,7 +1752,7 @@
                 showNotification('已进入排序模式，拖动机场对可调整顺序');
             } else {
                 // 退出排序模式
-                orderBtn.innerHTML = '🔄 调整机场对顺序';
+                orderBtn.innerHTML = '<span class="icon">🔄</span><span class="text">调整顺序</span>';
                 orderBtn.classList.remove('btn-success');
                 orderBtn.classList.add('btn-info');
                 dragInstructions.style.display = 'none';
@@ -1160,7 +1775,7 @@
             const dragInstructions = document.getElementById('dragInstructions');
             const listSortControls = document.getElementById('listSortControls');
             
-            orderBtn.innerHTML = '🔄 调整机场对顺序';
+            orderBtn.innerHTML = '<span class="icon">🔄</span><span class="text">调整顺序</span>';
             orderBtn.classList.remove('btn-success');
             orderBtn.classList.add('btn-info');
             dragInstructions.style.display = 'none';
@@ -1183,7 +1798,7 @@
             const dragInstructions = document.getElementById('dragInstructions');
             const listSortControls = document.getElementById('listSortControls');
             
-            orderBtn.innerHTML = '🔄 调整机场对顺序';
+            orderBtn.innerHTML = '<span class="icon">🔄</span><span class="text">调整顺序</span>';
             orderBtn.classList.remove('btn-success');
             orderBtn.classList.add('btn-info');
             dragInstructions.style.display = 'none';
@@ -1326,6 +1941,7 @@
                     release: allData[pair].release,
                     descend: allData[pair].descend,
                     selectedAlternates: Array.from(allData[pair].selectedAlternates || []),
+                    maxAlternates: allData[pair].maxAlternates || 5,
                     nextId: allData[pair].nextId
                 };
                 totalSegments += (allData[pair].release?.length || 0) + (allData[pair].descend?.length || 0);
@@ -1400,6 +2016,7 @@
                                     release: importedData.allData[pair].release || [],
                                     descend: importedData.allData[pair].descend || [],
                                     selectedAlternates: new Set(importedData.allData[pair].selectedAlternates || []),
+                                    maxAlternates: importedData.allData[pair].maxAlternates || 5,
                                     nextId: importedData.allData[pair].nextId || 1
                                 };
                             });
@@ -1410,6 +2027,9 @@
                         }
                         
                         renderAirportPairs();
+                        // 重新计算最大备降场数
+                        calculateMaxAlternatesCount();
+                        renderTableHeader();
                         renderTable();
                         updateStats();
                         saveAllData();
@@ -1464,6 +2084,7 @@
                     release: pairData.release,
                     descend: pairData.descend,
                     selectedAlternates: Array.from(pairData.selectedAlternates || []),
+                    maxAlternates: pairData.maxAlternates || 5,
                     nextId: pairData.nextId
                 };
                 totalSegments += (pairData.release?.length || 0) + (pairData.descend?.length || 0);
@@ -1486,6 +2107,7 @@
                     
                     <div class="data-info">
                         <p>包含 ${airportPairs.length} 个机场对，共 ${totalSegments} 条数据</p>
+                        <p>最大备降场数: ${maxAlternatesCount}</p>
                         <p>导出时间: ${new Date().toLocaleString()}</p>
                     </div>
                     
@@ -1565,6 +2187,7 @@
                             release: importedData.allData[pair].release || [],
                             descend: importedData.allData[pair].descend || [],
                             selectedAlternates: new Set(importedData.allData[pair].selectedAlternates || []),
+                            maxAlternates: importedData.allData[pair].maxAlternates || 5,
                             nextId: importedData.allData[pair].nextId || 1
                         };
                     });
@@ -1575,6 +2198,9 @@
                 }
                 
                 renderAirportPairs();
+                // 重新计算最大备降场数
+                calculateMaxAlternatesCount();
+                renderTableHeader();
                 renderTable();
                 updateStats();
                 saveAllData();
@@ -1646,7 +2272,7 @@
             }
         }
         
-        // 渲染表格（按释压和飘降分组，所有边框为淡灰色）
+        // 渲染表格（按释压和飘降分组，动态调整列数）
         function renderTable() {
             const tableBody = document.getElementById('tableBody');
             if (!tableBody) return;
@@ -1656,8 +2282,9 @@
             if (!currentPair || !allData[currentPair]) {
                 // 没有数据时显示空状态
                 const emptyRow = document.createElement('tr');
+                const colspan = maxAlternatesCount + 1; // +1 是航段列
                 emptyRow.innerHTML = `
-                    <td colspan="6" style="padding: 40px; text-align: center; color: #718096;">
+                    <td colspan="${colspan}" style="padding: 40px; text-align: center; color: #718096;">
                         <div style="font-size: 1.2rem; margin-bottom: 10px;">📊</div>
                         <div>请选择机场对并上传数据</div>
                     </td>
@@ -1675,8 +2302,9 @@
                 // 释压组标题行
                 const releaseHeader = document.createElement('tr');
                 releaseHeader.className = 'release-group';
+                const releaseColspan = maxAlternatesCount + 1;
                 releaseHeader.innerHTML = `
-                    <td colspan="6" class="group-title release-group-title">
+                    <td colspan="${releaseColspan}" class="group-title release-group-title">
                         <span class="program-indicator release-indicator">释压程序</span>
                         <span style="font-size: 0.9rem; color: #718096;">(${pairData.release.length}个航段)</span>
                     </td>
@@ -1688,42 +2316,36 @@
                     const tr = document.createElement('tr');
                     tr.className = 'release-group';
                     
-                    const hasSelectedAlternate = selectedAlternates.has(row.alternate1) || 
-                                              selectedAlternates.has(row.alternate2) || 
-                                              selectedAlternates.has(row.alternate3) || 
-                                              selectedAlternates.has(row.alternate4) || 
-                                              selectedAlternates.has(row.alternate5);
+                    // 检查该行是否有选中的备降场
+                    let hasSelectedAlternate = false;
+                    for (let i = 1; i <= maxAlternatesCount; i++) {
+                        const key = `alternate${i}`;
+                        if (selectedAlternates.has(row[key])) {
+                            hasSelectedAlternate = true;
+                            break;
+                        }
+                    }
                     
-                    tr.innerHTML = `
+                    let rowHTML = `
                         <td class="segment-cell ${hasSelectedAlternate ? 'selected' : ''}">
                             ${row.segment}
                         </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate1) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate1}"
-                            onclick="toggleAlternateHighlight('${row.alternate1}')">
-                            ${row.alternate1 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate2) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate2}"
-                            onclick="toggleAlternateHighlight('${row.alternate2}')">
-                            ${row.alternate2 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate3) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate3}"
-                            onclick="toggleAlternateHighlight('${row.alternate3}')">
-                            ${row.alternate3 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate4) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate4}"
-                            onclick="toggleAlternateHighlight('${row.alternate4}')">
-                            ${row.alternate4 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate5) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate5}"
-                            onclick="toggleAlternateHighlight('${row.alternate5}')">
-                            ${row.alternate5 || '-'}
-                        </td>
                     `;
+                    
+                    // 动态生成备降场单元格
+                    for (let i = 1; i <= maxAlternatesCount; i++) {
+                        const key = `alternate${i}`;
+                        const value = row[key] || '';
+                        rowHTML += `
+                            <td class="alternate-cell ${selectedAlternates.has(value) ? 'selected' : ''}" 
+                                data-alternate="${value}"
+                                onclick="toggleAlternateHighlight('${value}')">
+                                ${value || '-'}
+                            </td>
+                        `;
+                    }
+                    
+                    tr.innerHTML = rowHTML;
                     tableBody.appendChild(tr);
                 });
             }
@@ -1732,7 +2354,8 @@
             if (hasReleaseData && hasDescendData) {
                 const divider = document.createElement('tr');
                 divider.className = 'group-divider';
-                divider.innerHTML = `<td colspan="6"></td>`;
+                const dividerColspan = maxAlternatesCount + 1;
+                divider.innerHTML = `<td colspan="${dividerColspan}"></td>`;
                 tableBody.appendChild(divider);
             }
             
@@ -1741,8 +2364,9 @@
                 // 飘降组标题行
                 const descendHeader = document.createElement('tr');
                 descendHeader.className = 'descend-group';
+                const descendColspan = maxAlternatesCount + 1;
                 descendHeader.innerHTML = `
-                    <td colspan="6" class="group-title descend-group-title">
+                    <td colspan="${descendColspan}" class="group-title descend-group-title">
                         <span class="program-indicator descend-indicator">飘降程序</span>
                         <span style="font-size: 0.9rem; color: #718096;">(${pairData.descend.length}个航段)</span>
                     </td>
@@ -1754,42 +2378,36 @@
                     const tr = document.createElement('tr');
                     tr.className = 'descend-group';
                     
-                    const hasSelectedAlternate = selectedAlternates.has(row.alternate1) || 
-                                              selectedAlternates.has(row.alternate2) || 
-                                              selectedAlternates.has(row.alternate3) || 
-                                              selectedAlternates.has(row.alternate4) || 
-                                              selectedAlternates.has(row.alternate5);
+                    // 检查该行是否有选中的备降场
+                    let hasSelectedAlternate = false;
+                    for (let i = 1; i <= maxAlternatesCount; i++) {
+                        const key = `alternate${i}`;
+                        if (selectedAlternates.has(row[key])) {
+                            hasSelectedAlternate = true;
+                            break;
+                        }
+                    }
                     
-                    tr.innerHTML = `
+                    let rowHTML = `
                         <td class="segment-cell ${hasSelectedAlternate ? 'selected' : ''}">
                             ${row.segment}
                         </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate1) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate1}"
-                            onclick="toggleAlternateHighlight('${row.alternate1}')">
-                            ${row.alternate1 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate2) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate2}"
-                            onclick="toggleAlternateHighlight('${row.alternate2}')">
-                            ${row.alternate2 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate3) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate3}"
-                            onclick="toggleAlternateHighlight('${row.alternate3}')">
-                            ${row.alternate3 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate4) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate4}"
-                            onclick="toggleAlternateHighlight('${row.alternate4}')">
-                            ${row.alternate4 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate5) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate5}"
-                            onclick="toggleAlternateHighlight('${row.alternate5}')">
-                            ${row.alternate5 || '-'}
-                        </td>
                     `;
+                    
+                    // 动态生成备降场单元格
+                    for (let i = 1; i <= maxAlternatesCount; i++) {
+                        const key = `alternate${i}`;
+                        const value = row[key] || '';
+                        rowHTML += `
+                            <td class="alternate-cell ${selectedAlternates.has(value) ? 'selected' : ''}" 
+                                data-alternate="${value}"
+                                onclick="toggleAlternateHighlight('${value}')">
+                                ${value || '-'}
+                            </td>
+                        `;
+                    }
+                    
+                    tr.innerHTML = rowHTML;
                     tableBody.appendChild(tr);
                 });
             }
@@ -1797,8 +2415,9 @@
             // 如果没有数据
             if (!hasReleaseData && !hasDescendData) {
                 const emptyRow = document.createElement('tr');
+                const colspan = maxAlternatesCount + 1;
                 emptyRow.innerHTML = `
-                    <td colspan="6" style="padding: 40px; text-align: center; color: #718096;">
+                    <td colspan="${colspan}" style="padding: 40px; text-align: center; color: #718096;">
                         <div style="font-size: 1.2rem; margin-bottom: 10px;">📭</div>
                         <div>当前机场对暂无数据，请上传CSV文件</div>
                     </td>
@@ -1850,6 +2469,7 @@
             if (!currentPair || !allData[currentPair]) {
                 document.getElementById('totalSegments').textContent = '0';
                 document.getElementById('selectedAlternatesCount').textContent = '0';
+                document.getElementById('maxAlternatesCount').textContent = '5';
                 return;
             }
             
@@ -1859,6 +2479,7 @@
             document.getElementById('totalSegments').textContent = totalSegments;
             document.getElementById('selectedAlternatesCount').textContent = selectedAlternates.size;
             document.getElementById('currentPairName').textContent = currentPair;
+            document.getElementById('maxAlternatesCount').textContent = maxAlternatesCount;
         }
         
         // 添加机场对
@@ -1892,6 +2513,7 @@
                 release: [],
                 descend: [],
                 selectedAlternates: new Set(),
+                maxAlternates: 5,
                 nextId: 1
             };
             
@@ -1918,6 +2540,7 @@
                         release: [],
                         descend: [],
                         selectedAlternates: new Set(),
+                        maxAlternates: 5,
                         nextId: 1
                     };
                 }
@@ -1957,6 +2580,9 @@
             }
             
             renderAirportPairs();
+            // 重新计算最大备降场数
+            calculateMaxAlternatesCount();
+            renderTableHeader();
             renderTable();
             updateStats();
             saveAllData();
@@ -2009,7 +2635,7 @@
             fileInput.value = '';
         }
         
-        // 处理CSV文件
+        // 处理CSV文件 - 支持自适应列数和ALTN格式列名
         function processCSVFile(file, targetPair) {
             const reader = new FileReader();
             
@@ -2031,7 +2657,7 @@
                     
                     // 获取表头
                     const headers = rows[0];
-                    if (headers.length < 6) {
+                    if (headers.length < 2) {
                         showNotification(`文件"${file.name}"列数不足`, 'error');
                         return;
                     }
@@ -2053,6 +2679,7 @@
                             release: [],
                             descend: [],
                             selectedAlternates: new Set(),
+                            maxAlternates: 5,
                             nextId: 1
                         };
                     }
@@ -2060,25 +2687,46 @@
                     // 清空该程序类型下的旧数据
                     allData[targetPair][programType] = [];
                     
+                    // 计算该文件中的最大备降场列数
+                    let maxColumnsInFile = 0;
+                    
                     // 解析数据行
                     for (let i = 1; i < rows.length; i++) {
                         const row = rows[i];
-                        if (row.length >= 6 && row[0]) { // 至少要有航段名称
+                        if (row.length >= 1 && row[0]) { // 至少要有航段名称
+                            // 计算该行实际有数据的列数
+                            const dataColumns = row.filter(cell => cell && cell.trim() !== '').length;
+                            if (dataColumns > maxColumnsInFile) {
+                                maxColumnsInFile = dataColumns;
+                            }
+                            
                             const newRow = {
                                 id: allData[targetPair].nextId++,
-                                segment: row[0] || `航段-${i}`,
-                                alternate1: row[1] || '',
-                                alternate2: row[2] || '',
-                                alternate3: row[3] || '',
-                                alternate4: row[4] || '',
-                                alternate5: row[5] || ''
+                                segment: row[0] || `航段-${i}`
                             };
+                            
+                            // 动态添加备降场数据，最多支持10个
+                            // 支持两种表头格式：航路备降场X 或 ALTNX
+                            for (let j = 1; j <= 10; j++) {
+                                const key = `alternate${j}`;
+                                newRow[key] = row[j] || '';
+                            }
+                            
                             allData[targetPair][programType].push(newRow);
                         }
                     }
                     
+                    // 更新该机场对的最大备降场数
+                    const currentMax = allData[targetPair].maxAlternates || 5;
+                    const fileMax = Math.max(1, maxColumnsInFile - 1); // 减去航段列
+                    allData[targetPair].maxAlternates = Math.max(currentMax, fileMax);
+                    
+                    // 重新计算全局最大备降场数
+                    calculateMaxAlternatesCount();
+                    
                     // 如果当前显示的就是这个机场对，刷新表格
                     if (currentPair === targetPair) {
+                        renderTableHeader();
                         renderTable();
                         updateStats();
                     }
@@ -2087,7 +2735,7 @@
                     renderPairsList();
                     
                     saveAllData();
-                    showNotification(`已导入${allData[targetPair][programType].length}条${programType === 'release' ? '释压' : '飘降'}数据到"${targetPair}"`);
+                    showNotification(`已导入${allData[targetPair][programType].length}条${programType === 'release' ? '释压' : '飘降'}数据到"${targetPair}"，检测到${fileMax}个备降场列`);
                     
                 } catch (error) {
                     console.error('CSV解析错误:', error);
@@ -2148,13 +2796,13 @@
             return rows;
         }
         
-        // 下载释压模板
+        // 下载释压模板 - 使用ALTN格式
         function downloadReleaseTemplate() {
             const BOM = '\uFEFF';
-            const template = BOM + `航段,航路备降场1,航路备降场2,航路备降场3,航路备降场4,航路备降场5
-航段-01,PEK,SHA,CAN,SZX,XIY
-航段-02,PVG,CTU,KMG,URC,HRB
-航段-03,CAN,SZX,CTU,XIY,TAO`;
+            const template = BOM + `航段,ALTN1,ALTN2,ALTN3,ALTN4,ALTN5,ALTN6,ALTN7,ALTN8,ALTN9,ALTN10
+航段-01,PEK,SHA,CAN,SZX,XIY,CTU,KMG,URC,HRB,DLC
+航段-02,PVG,CTU,KMG,URC,HRB,SHA,PEK,CAN,SZX,XIY
+航段-03,CAN,SZX,CTU,XIY,TAO,PVG,KMG,URC,HRB,PEK`;
             
             const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(template);
             const linkElement = document.createElement('a');
@@ -2162,16 +2810,16 @@
             linkElement.setAttribute('download', 'NS释压模板.csv');
             linkElement.click();
             
-            showNotification('释压模板已下载');
+            showNotification('释压模板已下载，支持最多10个备降场(ALTN格式)');
         }
         
-        // 下载飘降模板
+        // 下载飘降模板 - 使用ALTN格式
         function downloadDescendTemplate() {
             const BOM = '\uFEFF';
-            const template = BOM + `航段,航路备降场1,航路备降场2,航路备降场3,航路备降场4,航路备降场5
-航段-04,SZX,CTU,KMG,URC,HRB
-航段-05,CTU,PEK,SHA,CAN,SZX
-航段-06,XIY,CKG,KWE,WUH,CSX`;
+            const template = BOM + `航段,ALTN1,ALTN2,ALTN3,ALTN4,ALTN5,ALTN6,ALTN7,ALTN8,ALTN9,ALTN10
+航段-04,SZX,CTU,KMG,URC,HRB,PEK,SHA,CAN,XIY,TAO
+航段-05,CTU,PEK,SHA,CAN,SZX,XIY,KMG,URC,HRB,PVG
+航段-06,XIY,CKG,KWE,WUH,CSX,CTU,SZX,CAN,PEK,SHA`;
             
             const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(template);
             const linkElement = document.createElement('a');
@@ -2179,19 +2827,19 @@
             linkElement.setAttribute('download', 'NS飘降模板.csv');
             linkElement.click();
             
-            showNotification('飘降模板已下载');
+            showNotification('飘降模板已下载，支持最多10个备降场(ALTN格式)');
         }
         
-        // 下载完整模板
+        // 下载完整模板 - 使用ALTN格式
         function downloadCombinedTemplate() {
             const BOM = '\uFEFF';
-            const template = BOM + `航段,航路备降场1,航路备降场2,航路备降场3,航路备降场4,航路备降场5
-航段-01,PEK,SHA,CAN,SZX,XIY
-航段-02,PVG,CTU,KMG,URC,HRB
-航段-03,CAN,SZX,CTU,XIY,TAO
-航段-04,SZX,CTU,KMG,URC,HRB
-航段-05,CTU,PEK,SHA,CAN,SZX
-航段-06,XIY,CKG,KWE,WUH,CSX`;
+            const template = BOM + `航段,ALTN1,ALTN2,ALTN3,ALTN4,ALTN5,ALTN6,ALTN7,ALTN8,ALTN9,ALTN10
+航段-01,PEK,SHA,CAN,SZX,XIY,CTU,KMG,URC,HRB,DLC
+航段-02,PVG,CTU,KMG,URC,HRB,SHA,PEK,CAN,SZX,XIY
+航段-03,CAN,SZX,CTU,XIY,TAO,PVG,KMG,URC,HRB,PEK
+航段-04,SZX,CTU,KMG,URC,HRB,PEK,SHA,CAN,XIY,TAO
+航段-05,CTU,PEK,SHA,CAN,SZX,XIY,KMG,URC,HRB,PVG
+航段-06,XIY,CKG,KWE,WUH,CSX,CTU,SZX,CAN,PEK,SHA`;
             
             const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(template);
             const linkElement = document.createElement('a');
@@ -2199,7 +2847,7 @@
             linkElement.setAttribute('download', 'NS释压飘降完整模板.csv');
             linkElement.click();
             
-            showNotification('完整模板已下载');
+            showNotification('完整模板已下载，支持最多10个备降场(ALTN格式)');
         }
         
         // 拖拽上传处理
@@ -2249,8 +2897,12 @@
                 allData[currentPair].descend = [];
                 allData[currentPair].selectedAlternates.clear();
                 selectedAlternates.clear();
+                allData[currentPair].maxAlternates = 5;
                 allData[currentPair].nextId = 1;
                 
+                // 重新计算全局最大备降场数
+                calculateMaxAlternatesCount();
+                renderTableHeader();
                 renderTable();
                 updateStats();
                 renderPairsList();
@@ -2275,6 +2927,7 @@
                 allData[pair].release = [];
                 allData[pair].descend = [];
                 allData[pair].selectedAlternates.clear();
+                allData[pair].maxAlternates = 5;
                 allData[pair].nextId = 1;
             });
             
@@ -2282,6 +2935,13 @@
                 selectedAlternates.clear();
             }
             
+            // 重置最大备降场数
+            maxAlternatesCount = 5;
+            document.getElementById('maxAlternatesCount').textContent = maxAlternatesCount;
+            document.getElementById('currentColumnsCount').textContent = maxAlternatesCount;
+            document.getElementById('columnsInfo').style.display = 'none';
+            
+            renderTableHeader();
             renderTable();
             updateStats();
             renderPairsList();
@@ -2316,6 +2976,9 @@
             
             if (currentPair && allData[currentPair]) {
                 selectedAlternates = allData[currentPair].selectedAlternates || new Set();
+                // 重新计算最大备降场数
+                calculateMaxAlternatesCount();
+                renderTableHeader();
                 renderTable();
                 updateStats();
             }
@@ -2325,13 +2988,14 @@
             showNotification('已加载所有示例数据');
         }
         
-        // 保存所有数据到本地存储（自动保存，用户无需手动操作）
+        // 保存所有数据到本地存储
         function saveAllData() {
             const saveData = {
                 version: DATA_VERSION,
                 airportPairs: airportPairs,
                 allData: {},
                 currentPair: currentPair,
+                maxAlternatesCount: maxAlternatesCount,
                 saveTime: Date.now()
             };
             
@@ -2341,6 +3005,7 @@
                     release: allData[pair].release,
                     descend: allData[pair].descend,
                     selectedAlternates: Array.from(allData[pair].selectedAlternates || []),
+                    maxAlternates: allData[pair].maxAlternates || 5,
                     nextId: allData[pair].nextId
                 };
             });
@@ -2357,6 +3022,9 @@
                     airportPairs = data.airportPairs || [];
                     currentPair = data.currentPair || (airportPairs.length > 0 ? airportPairs[0] : null);
                     
+                    // 恢复全局最大备降场数
+                    maxAlternatesCount = data.maxAlternatesCount || 5;
+                    
                     // 恢复数据，转换数组为Set
                     allData = {};
                     if (data.allData) {
@@ -2365,6 +3033,7 @@
                                 release: data.allData[pair].release || [],
                                 descend: data.allData[pair].descend || [],
                                 selectedAlternates: new Set(data.allData[pair].selectedAlternates || []),
+                                maxAlternates: data.allData[pair].maxAlternates || 5,
                                 nextId: data.allData[pair].nextId || 1
                             };
                         });
@@ -2416,6 +3085,16 @@
                 }
             });
             
+            // 设备检测
+            detectDevice();
+            adjustUIForDevice();
+            
+            // 窗口大小改变时重新检测设备
+            window.addEventListener('resize', function() {
+                detectDevice();
+                adjustUIForDevice();
+            });
+            
             // 检查密码验证状态
             checkPasswordFromStorage();
             
@@ -2426,6 +3105,12 @@
             } else {
                 renderAirportPairs();
                 if (currentPair) {
+                    // 显示列数信息
+                    if (maxAlternatesCount > 5) {
+                        document.getElementById('columnsInfo').style.display = 'flex';
+                        document.getElementById('currentColumnsCount').textContent = maxAlternatesCount;
+                    }
+                    renderTableHeader();
                     renderTable();
                     updateStats();
                 }
