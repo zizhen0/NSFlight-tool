@@ -535,6 +535,86 @@
         .drag-instructions li {
             margin-bottom: 3px;
         }
+        .sync-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f7ff;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .sync-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .backup-note {
+            background: #fffaf0;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #fed7d7;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #9c4221;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .modal-title {
+            margin: 0;
+            color: #2d3748;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+        .data-info {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        .backup-textarea {
+            width: 100%;
+            height: 300px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
     </style>
 </head>
 <body>
@@ -620,6 +700,7 @@
                 
                 <!-- 数据管理内容 (默认隐藏，密码验证后显示) -->
                 <div id="dataManageContent" class="locked-content">
+                    <!-- 机场对管理 -->
                     <div class="pair-management">
                         <h4 style="margin-bottom: 10px; color: #2d3748;">机场对管理</h4>
                         <div class="pair-input-group">
@@ -638,6 +719,58 @@
                         </div>
                     </div>
                     
+                    <!-- 数据同步功能 -->
+                    <div class="sync-section">
+                        <h4 style="margin-bottom: 15px; color: #2d3748;">🔄 多设备数据同步</h4>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <p style="color: #4a5568; margin-bottom: 10px;">
+                                <strong>注意：</strong>本工具数据默认存储在浏览器本地，不同设备间需要手动同步。
+                            </p>
+                            
+                            <div class="sync-options">
+                                <button class="btn-success" onclick="exportAllData()" style="text-align: left; display: flex; align-items: center; gap: 8px;">
+                                    <span>📤 导出所有数据 (JSON文件)</span>
+                                    <small style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">推荐使用</small>
+                                </button>
+                                
+                                <button class="btn-warning" onclick="importData()" style="text-align: left; display: flex; align-items: center; gap: 8px;">
+                                    <span>📥 导入数据文件</span>
+                                    <small style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">.json格式</small>
+                                </button>
+                                
+                                <button class="btn-info" onclick="generateBackupCode()" style="text-align: left; display: flex; align-items: center; gap: 8px;">
+                                    <span>📋 生成备份代码</span>
+                                    <small style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">文本格式</small>
+                                </button>
+                                
+                                <button class="btn-secondary" onclick="importFromText()" style="text-align: left; display: flex; align-items: center; gap: 8px;">
+                                    <span>📝 从文本导入</span>
+                                    <small style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">粘贴备份代码</small>
+                                </button>
+                                
+                                <div style="margin-top: 10px; padding: 10px; background: #fff; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                    <h5 style="margin-bottom: 8px; color: #2d3748;">💡 同步说明</h5>
+                                    <ol style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: #4a5568;">
+                                        <li>在A电脑：点击"导出所有数据"下载文件</li>
+                                        <li>将文件发送到B电脑（微信、邮件等）</li>
+                                        <li>在B电脑：点击"导入数据文件"选择文件</li>
+                                        <li>所有数据将同步到B电脑</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="backup-note">
+                        <strong>💾 备份提醒：</strong>
+                        <span id="lastBackupInfo">从未备份</span>
+                        <button onclick="exportAllData()" style="margin-left: 10px; padding: 4px 8px; background: #38a169; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
+                            立即备份
+                        </button>
+                    </div>
+                    
+                    <!-- 模板下载 -->
                     <div class="template-section">
                         <h4 style="margin-bottom: 15px; color: #2d3748;">数据导入模板</h4>
                         
@@ -688,6 +821,7 @@
                         </div>
                     </div>
                     
+                    <!-- 数据导入 -->
                     <div class="import-section">
                         <h4 style="margin-bottom: 15px; color: #2d3748;">数据导入</h4>
                         
@@ -715,6 +849,7 @@
                         </div>
                     </div>
                     
+                    <!-- 批量操作 -->
                     <div style="margin-top: 15px;">
                         <h4 style="margin-bottom: 10px; color: #2d3748;">批量操作</h4>
                         <div style="display: flex; gap: 10px;">
@@ -731,6 +866,7 @@
         </div>
     </div>
     
+    <!-- 通知 -->
     <div class="notification" id="notification">
         <span id="notificationMessage">操作成功</span>
     </div>
@@ -751,6 +887,9 @@
         // 密码验证状态
         let passwordVerified = false;
         const PASSWORD = "28420";
+        
+        // 数据版本
+        const DATA_VERSION = "2.0";
         
         // 初始化示例数据
         function initSampleData() {
@@ -779,6 +918,7 @@
                 updateStats();
             }
             saveAllData();
+            updateLastBackupInfo();
             showNotification('示例数据已初始化');
         }
         
@@ -845,1113 +985,4 @@
             
             // 释压示例数据
             allData[pairName].release = [
-                { id: 1, segment: `${pairName}-释压-01`, alternate1: 'PEK', alternate2: 'SHA', alternate3: 'CAN', alternate4: 'SZX', alternate5: 'XIY' },
-                { id: 2, segment: `${pairName}-释压-02`, alternate1: 'PVG', alternate2: 'CTU', alternate3: 'KMG', alternate4: 'URC', alternate5: 'HRB' },
-                { id: 3, segment: `${pairName}-释压-03`, alternate1: 'CAN', alternate2: 'SZX', alternate3: 'CTU', alternate4: 'XIY', alternate5: 'TAO' }
-            ];
-            
-            // 飘降示例数据
-            allData[pairName].descend = [
-                { id: 4, segment: `${pairName}-飘降-01`, alternate1: 'SZX', alternate2: 'CTU', alternate3: 'KMG', alternate4: 'URC', alternate5: 'HRB' },
-                { id: 5, segment: `${pairName}-飘降-02`, alternate1: 'CTU', alternate2: 'PEK', alternate3: 'SHA', alternate4: 'CAN', alternate5: 'SZX' },
-                { id: 6, segment: `${pairName}-飘降-03`, alternate1: 'XIY', alternate2: 'CKG', alternate3: 'KWE', alternate4: 'WUH', alternate5: 'CSX' }
-            ];
-            
-            allData[pairName].nextId = 7;
-        }
-        
-        // 渲染机场对按钮
-        function renderAirportPairs() {
-            const container = document.getElementById('airportPairsContainer');
-            container.innerHTML = '';
-            
-            airportPairs.forEach((pair, index) => {
-                const pairElement = document.createElement('div');
-                pairElement.className = `airport-pair ${currentPair === pair ? 'selected' : ''} ${isReorderMode ? 'reorder-mode' : ''}`;
-                pairElement.setAttribute('data-index', index);
-                pairElement.setAttribute('data-pair', pair);
-                
-                if (isReorderMode) {
-                    // 排序模式：显示拖拽手柄，可拖拽
-                    pairElement.innerHTML = `
-                        <span class="drag-handle" draggable="true" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)">☰</span>
-                        ${pair}
-                        <button class="upload-btn" onclick="event.stopPropagation(); uploadForPair('${pair}')">上传</button>
-                    `;
-                    
-                    // 设置拖拽事件
-                    pairElement.setAttribute('draggable', 'true');
-                    pairElement.ondragstart = (e) => handleDragStart(e, index, pair);
-                    pairElement.ondragover = handleDragOverPair;
-                    pairElement.ondrop = (e) => handleDropPair(e, index);
-                    pairElement.ondragleave = handleDragLeavePair;
-                } else {
-                    // 正常模式
-                    pairElement.innerHTML = `
-                        ${pair}
-                        <button class="upload-btn" onclick="event.stopPropagation(); uploadForPair('${pair}')">上传</button>
-                    `;
-                    pairElement.onclick = () => selectAirportPair(pair);
-                }
-                
-                container.appendChild(pairElement);
-            });
-            
-            // 更新当前机场对名称显示
-            document.getElementById('currentPairName').textContent = currentPair || '-';
-            
-            // 渲染机场对列表（在数据管理中）
-            renderPairsList();
-        }
-        
-        // 渲染机场对列表（数据管理区域）
-        function renderPairsList() {
-            const container = document.getElementById('pairsList');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            airportPairs.forEach((pair, index) => {
-                const pairData = allData[pair] || { release: [], descend: [] };
-                const totalSegments = pairData.release.length + pairData.descend.length;
-                
-                const div = document.createElement('div');
-                div.className = 'pair-item';
-                div.setAttribute('data-index', index);
-                div.setAttribute('data-pair', pair);
-                
-                // 设置拖拽事件（在数据管理列表中）
-                if (passwordVerified) {
-                    div.setAttribute('draggable', 'true');
-                    div.ondragstart = (e) => handleDragStartList(e, index, pair);
-                    div.ondragover = handleDragOverListItem;
-                    div.ondrop = (e) => handleDropListItem(e, index);
-                    div.ondragleave = handleDragLeaveListItem;
-                }
-                
-                div.innerHTML = `
-                    <div class="pair-info">
-                        <span class="drag-handle" draggable="true">☰</span>
-                        <div>
-                            <strong>${pair}</strong>
-                            <span style="font-size: 0.8rem; color: #718096; margin-left: 10px;">
-                                (释压: ${pairData.release.length} | 飘降: ${pairData.descend.length})
-                            </span>
-                        </div>
-                    </div>
-                    <div class="pair-actions">
-                        <button onclick="deleteAirportPair('${pair}')" style="padding: 4px 8px; background: #e53e3e; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
-                            删除
-                        </button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-        
-        // 选择机场对
-        function selectAirportPair(pair) {
-            if (isReorderMode) return; // 在排序模式下不响应点击选择
-            
-            currentPair = pair;
-            if (allData[pair]) {
-                selectedAlternates = allData[pair].selectedAlternates || new Set();
-            } else {
-                allData[pair] = {
-                    release: [],
-                    descend: [],
-                    selectedAlternates: new Set(),
-                    nextId: 1
-                };
-                selectedAlternates = new Set();
-            }
-            
-            renderAirportPairs();
-            renderTable();
-            updateStats();
-            showNotification(`已切换到机场对：${pair}`);
-        }
-        
-        // 切换排序模式
-        function togglePairOrderMode() {
-            isReorderMode = !isReorderMode;
-            
-            const orderBtn = document.getElementById('orderModeBtn');
-            const dragInstructions = document.getElementById('dragInstructions');
-            const listSortControls = document.getElementById('listSortControls');
-            
-            if (isReorderMode) {
-                // 进入排序模式
-                orderBtn.innerHTML = '✅ 完成排序';
-                orderBtn.classList.remove('btn-info');
-                orderBtn.classList.add('btn-success');
-                dragInstructions.style.display = 'block';
-                listSortControls.style.display = 'flex';
-                
-                // 保存原始顺序，以便取消时恢复
-                originalPairOrder = [...airportPairs];
-                
-                showNotification('已进入排序模式，拖动机场对可调整顺序');
-            } else {
-                // 退出排序模式
-                orderBtn.innerHTML = '🔄 调整机场对顺序';
-                orderBtn.classList.remove('btn-success');
-                orderBtn.classList.add('btn-info');
-                dragInstructions.style.display = 'none';
-                listSortControls.style.display = 'none';
-                
-                // 保存当前顺序
-                saveAllData();
-                showNotification('已退出排序模式，顺序已保存');
-            }
-            
-            renderAirportPairs();
-        }
-        
-        // 保存机场对顺序
-        function savePairOrder() {
-            saveAllData();
-            isReorderMode = false;
-            
-            const orderBtn = document.getElementById('orderModeBtn');
-            const dragInstructions = document.getElementById('dragInstructions');
-            const listSortControls = document.getElementById('listSortControls');
-            
-            orderBtn.innerHTML = '🔄 调整机场对顺序';
-            orderBtn.classList.remove('btn-success');
-            orderBtn.classList.add('btn-info');
-            dragInstructions.style.display = 'none';
-            listSortControls.style.display = 'none';
-            
-            showNotification('机场对顺序已保存');
-            renderAirportPairs();
-        }
-        
-        // 取消排序，恢复原始顺序
-        function cancelPairOrder() {
-            if (originalPairOrder.length > 0) {
-                airportPairs = [...originalPairOrder];
-                renderAirportPairs();
-                showNotification('已恢复原始顺序');
-            }
-            
-            isReorderMode = false;
-            const orderBtn = document.getElementById('orderModeBtn');
-            const dragInstructions = document.getElementById('dragInstructions');
-            const listSortControls = document.getElementById('listSortControls');
-            
-            orderBtn.innerHTML = '🔄 调整机场对顺序';
-            orderBtn.classList.remove('btn-success');
-            orderBtn.classList.add('btn-info');
-            dragInstructions.style.display = 'none';
-            listSortControls.style.display = 'none';
-        }
-        
-        // 拖拽功能 - 机场对按钮区域
-        function handleDragStart(e, index, pair) {
-            draggedItem = pair;
-            draggedItemIndex = index;
-            e.dataTransfer.setData('text/plain', pair);
-            e.dataTransfer.effectAllowed = 'move';
-            
-            const element = e.target.closest('.airport-pair');
-            if (element) {
-                element.classList.add('dragging');
-                setTimeout(() => element.classList.add('dragging'), 0);
-            }
-        }
-        
-        function handleDragOverPair(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            
-            const element = e.target.closest('.airport-pair');
-            if (element && element !== draggedItem) {
-                element.classList.add('drag-over');
-            }
-        }
-        
-        function handleDragLeavePair(e) {
-            const element = e.target.closest('.airport-pair');
-            if (element) {
-                element.classList.remove('drag-over');
-            }
-        }
-        
-        function handleDropPair(e, dropIndex) {
-            e.preventDefault();
-            
-            const element = e.target.closest('.airport-pair');
-            if (element) {
-                element.classList.remove('drag-over');
-            }
-            
-            if (draggedItem !== null && draggedItemIndex !== dropIndex) {
-                // 从数组中移除拖拽的项目
-                airportPairs.splice(draggedItemIndex, 1);
-                
-                // 在目标位置插入
-                airportPairs.splice(dropIndex, 0, draggedItem);
-                
-                // 重新渲染
-                renderAirportPairs();
-                
-                // 重置拖拽状态
-                setTimeout(() => {
-                    const draggingElements = document.querySelectorAll('.airport-pair.dragging');
-                    draggingElements.forEach(el => el.classList.remove('dragging'));
-                }, 0);
-            }
-        }
-        
-        function handleDragEnd(e) {
-            const elements = document.querySelectorAll('.airport-pair.drag-over, .airport-pair.dragging');
-            elements.forEach(el => {
-                el.classList.remove('drag-over');
-                el.classList.remove('dragging');
-            });
-            
-            draggedItem = null;
-            draggedItemIndex = -1;
-        }
-        
-        // 拖拽功能 - 数据管理列表
-        function handleDragStartList(e, index, pair) {
-            if (!passwordVerified) return;
-            
-            draggedItem = pair;
-            draggedItemIndex = index;
-            e.dataTransfer.setData('text/plain', pair);
-            e.dataTransfer.effectAllowed = 'move';
-            
-            const element = e.target.closest('.pair-item');
-            if (element) {
-                element.classList.add('dragging');
-            }
-        }
-        
-        function handleDragOverListItem(e) {
-            if (!passwordVerified) return;
-            
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        }
-        
-        function handleDragLeaveListItem(e) {
-            // 不需要特殊处理
-        }
-        
-        function handleDropListItem(e, dropIndex) {
-            if (!passwordVerified) return;
-            
-            e.preventDefault();
-            
-            if (draggedItem !== null && draggedItemIndex !== dropIndex) {
-                // 从数组中移除拖拽的项目
-                airportPairs.splice(draggedItemIndex, 1);
-                
-                // 在目标位置插入
-                airportPairs.splice(dropIndex, 0, draggedItem);
-                
-                // 重新渲染
-                renderAirportPairs();
-                renderPairsList();
-                
-                // 重置拖拽状态
-                const draggingElements = document.querySelectorAll('.pair-item.dragging');
-                draggingElements.forEach(el => el.classList.remove('dragging'));
-            }
-        }
-        
-        // 渲染表格（按释压和飘降分组，所有边框为淡灰色）
-        function renderTable() {
-            const tableBody = document.getElementById('tableBody');
-            if (!tableBody) return;
-            
-            tableBody.innerHTML = '';
-            
-            if (!currentPair || !allData[currentPair]) {
-                // 没有数据时显示空状态
-                const emptyRow = document.createElement('tr');
-                emptyRow.innerHTML = `
-                    <td colspan="6" style="padding: 40px; text-align: center; color: #718096;">
-                        <div style="font-size: 1.2rem; margin-bottom: 10px;">📊</div>
-                        <div>请选择机场对并上传数据</div>
-                    </td>
-                `;
-                tableBody.appendChild(emptyRow);
-                return;
-            }
-            
-            const pairData = allData[currentPair];
-            const hasReleaseData = pairData.release && pairData.release.length > 0;
-            const hasDescendData = pairData.descend && pairData.descend.length > 0;
-            
-            // 渲染释压数据
-            if (hasReleaseData) {
-                // 释压组标题行
-                const releaseHeader = document.createElement('tr');
-                releaseHeader.className = 'release-group';
-                releaseHeader.innerHTML = `
-                    <td colspan="6" class="group-title release-group-title">
-                        <span class="program-indicator release-indicator">释压程序</span>
-                        <span style="font-size: 0.9rem; color: #718096;">(${pairData.release.length}个航段)</span>
-                    </td>
-                `;
-                tableBody.appendChild(releaseHeader);
-                
-                // 释压数据行
-                pairData.release.forEach(row => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'release-group';
-                    
-                    const hasSelectedAlternate = selectedAlternates.has(row.alternate1) || 
-                                              selectedAlternates.has(row.alternate2) || 
-                                              selectedAlternates.has(row.alternate3) || 
-                                              selectedAlternates.has(row.alternate4) || 
-                                              selectedAlternates.has(row.alternate5);
-                    
-                    tr.innerHTML = `
-                        <td class="segment-cell ${hasSelectedAlternate ? 'selected' : ''}">
-                            ${row.segment}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate1) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate1}"
-                            onclick="toggleAlternateHighlight('${row.alternate1}')">
-                            ${row.alternate1 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate2) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate2}"
-                            onclick="toggleAlternateHighlight('${row.alternate2}')">
-                            ${row.alternate2 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate3) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate3}"
-                            onclick="toggleAlternateHighlight('${row.alternate3}')">
-                            ${row.alternate3 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate4) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate4}"
-                            onclick="toggleAlternateHighlight('${row.alternate4}')">
-                            ${row.alternate4 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate5) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate5}"
-                            onclick="toggleAlternateHighlight('${row.alternate5}')">
-                            ${row.alternate5 || '-'}
-                        </td>
-                    `;
-                    tableBody.appendChild(tr);
-                });
-            }
-            
-            // 组间分隔线（如果有释压和飘降数据）
-            if (hasReleaseData && hasDescendData) {
-                const divider = document.createElement('tr');
-                divider.className = 'group-divider';
-                divider.innerHTML = `<td colspan="6"></td>`;
-                tableBody.appendChild(divider);
-            }
-            
-            // 渲染飘降数据
-            if (hasDescendData) {
-                // 飘降组标题行
-                const descendHeader = document.createElement('tr');
-                descendHeader.className = 'descend-group';
-                descendHeader.innerHTML = `
-                    <td colspan="6" class="group-title descend-group-title">
-                        <span class="program-indicator descend-indicator">飘降程序</span>
-                        <span style="font-size: 0.9rem; color: #718096;">(${pairData.descend.length}个航段)</span>
-                    </td>
-                `;
-                tableBody.appendChild(descendHeader);
-                
-                // 飘降数据行
-                pairData.descend.forEach(row => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'descend-group';
-                    
-                    const hasSelectedAlternate = selectedAlternates.has(row.alternate1) || 
-                                              selectedAlternates.has(row.alternate2) || 
-                                              selectedAlternates.has(row.alternate3) || 
-                                              selectedAlternates.has(row.alternate4) || 
-                                              selectedAlternates.has(row.alternate5);
-                    
-                    tr.innerHTML = `
-                        <td class="segment-cell ${hasSelectedAlternate ? 'selected' : ''}">
-                            ${row.segment}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate1) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate1}"
-                            onclick="toggleAlternateHighlight('${row.alternate1}')">
-                            ${row.alternate1 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate2) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate2}"
-                            onclick="toggleAlternateHighlight('${row.alternate2}')">
-                            ${row.alternate2 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate3) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate3}"
-                            onclick="toggleAlternateHighlight('${row.alternate3}')">
-                            ${row.alternate3 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate4) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate4}"
-                            onclick="toggleAlternateHighlight('${row.alternate4}')">
-                            ${row.alternate4 || '-'}
-                        </td>
-                        <td class="alternate-cell ${selectedAlternates.has(row.alternate5) ? 'selected' : ''}" 
-                            data-alternate="${row.alternate5}"
-                            onclick="toggleAlternateHighlight('${row.alternate5}')">
-                            ${row.alternate5 || '-'}
-                        </td>
-                    `;
-                    tableBody.appendChild(tr);
-                });
-            }
-            
-            // 如果没有数据
-            if (!hasReleaseData && !hasDescendData) {
-                const emptyRow = document.createElement('tr');
-                emptyRow.innerHTML = `
-                    <td colspan="6" style="padding: 40px; text-align: center; color: #718096;">
-                        <div style="font-size: 1.2rem; margin-bottom: 10px;">📭</div>
-                        <div>当前机场对暂无数据，请上传CSV文件</div>
-                    </td>
-                `;
-                tableBody.appendChild(emptyRow);
-            }
-            
-            updateSelectedAlternatesDisplay();
-        }
-        
-        // 切换备降场高亮状态
-        function toggleAlternateHighlight(alternateCode) {
-            if (!alternateCode || alternateCode.trim() === '' || alternateCode === '-') return;
-            
-            if (selectedAlternates.has(alternateCode)) {
-                selectedAlternates.delete(alternateCode);
-            } else {
-                selectedAlternates.add(alternateCode);
-            }
-            
-            // 保存到当前机场对的数据中
-            if (currentPair && allData[currentPair]) {
-                allData[currentPair].selectedAlternates = selectedAlternates;
-            }
-            
-            renderTable();
-            updateStats();
-            saveAllData();
-        }
-        
-        // 更新已选备降场显示
-        function updateSelectedAlternatesDisplay() {
-            const container = document.getElementById('selectedAlternatesContainer');
-            container.innerHTML = '';
-            
-            selectedAlternates.forEach(code => {
-                const tag = document.createElement('div');
-                tag.className = 'alternate-tag';
-                tag.innerHTML = `
-                    🛬 ${code}
-                    <button class="remove" onclick="toggleAlternateHighlight('${code}')">×</button>
-                `;
-                container.appendChild(tag);
-            });
-        }
-        
-        // 更新统计信息
-        function updateStats() {
-            if (!currentPair || !allData[currentPair]) {
-                document.getElementById('totalSegments').textContent = '0';
-                document.getElementById('selectedAlternatesCount').textContent = '0';
-                return;
-            }
-            
-            const pairData = allData[currentPair];
-            const totalSegments = (pairData.release?.length || 0) + (pairData.descend?.length || 0);
-            
-            document.getElementById('totalSegments').textContent = totalSegments;
-            document.getElementById('selectedAlternatesCount').textContent = selectedAlternates.size;
-            document.getElementById('currentPairName').textContent = currentPair;
-        }
-        
-        // 添加机场对
-        function addAirportPair() {
-            // 检查密码验证状态
-            if (!passwordVerified) {
-                showNotification('请先验证密码以访问此功能', 'error');
-                return;
-            }
-            
-            const input = document.getElementById('newAirportPair');
-            const pair = input.value.trim();
-            
-            if (!pair) {
-                showNotification('请输入机场对名称', 'error');
-                return;
-            }
-            
-            if (!pair.includes('-')) {
-                showNotification('机场对格式应为"起点-终点"，例如：石家庄-大兴', 'error');
-                return;
-            }
-            
-            if (airportPairs.includes(pair)) {
-                showNotification('该机场对已存在', 'error');
-                return;
-            }
-            
-            airportPairs.push(pair);
-            allData[pair] = {
-                release: [],
-                descend: [],
-                selectedAlternates: new Set(),
-                nextId: 1
-            };
-            
-            input.value = '';
-            renderAirportPairs();
-            saveAllData();
-            showNotification(`已添加机场对：${pair}`);
-        }
-        
-        // 添加示例机场对
-        function addSamplePairs() {
-            // 检查密码验证状态
-            if (!passwordVerified) {
-                showNotification('请先验证密码以访问此功能', 'error');
-                return;
-            }
-            
-            const samplePairs = ['成都-重庆', '重庆-昆明', '昆明-成都', '西安-郑州', '郑州-武汉'];
-            
-            samplePairs.forEach(pair => {
-                if (!airportPairs.includes(pair)) {
-                    airportPairs.push(pair);
-                    allData[pair] = {
-                        release: [],
-                        descend: [],
-                        selectedAlternates: new Set(),
-                        nextId: 1
-                    };
-                }
-            });
-            
-            renderAirportPairs();
-            saveAllData();
-            showNotification(`已添加${samplePairs.length}个示例机场对`);
-        }
-        
-        // 删除机场对
-        function deleteAirportPair(pair) {
-            // 检查密码验证状态
-            if (!passwordVerified) {
-                showNotification('请先验证密码以访问此功能', 'error');
-                return;
-            }
-            
-            if (!confirm(`确定要删除机场对"${pair}"及其所有数据吗？`)) {
-                return;
-            }
-            
-            const index = airportPairs.indexOf(pair);
-            if (index !== -1) {
-                airportPairs.splice(index, 1);
-            }
-            
-            delete allData[pair];
-            
-            if (currentPair === pair) {
-                currentPair = airportPairs.length > 0 ? airportPairs[0] : null;
-                if (currentPair) {
-                    selectedAlternates = allData[currentPair].selectedAlternates || new Set();
-                } else {
-                    selectedAlternates = new Set();
-                }
-            }
-            
-            renderAirportPairs();
-            renderTable();
-            updateStats();
-            saveAllData();
-            showNotification(`已删除机场对：${pair}`);
-        }
-        
-        // 为指定机场对上传数据
-        function uploadForPair(pair) {
-            // 检查密码验证状态
-            if (!passwordVerified) {
-                showNotification('请先验证密码以访问此功能', 'error');
-                return;
-            }
-            
-            // 临时存储要上传的机场对
-            window.tempUploadPair = pair;
-            document.getElementById('fileInput').click();
-        }
-        
-        // 处理文件选择
-        function handleFileSelect() {
-            // 检查密码验证状态
-            if (!passwordVerified) {
-                showNotification('请先验证密码以访问此功能', 'error');
-                return;
-            }
-            
-            const fileInput = document.getElementById('fileInput');
-            const files = fileInput.files;
-            
-            if (!files || files.length === 0) {
-                return;
-            }
-            
-            // 如果有临时指定的机场对，使用它，否则使用当前选中的机场对
-            const targetPair = window.tempUploadPair || currentPair;
-            delete window.tempUploadPair;
-            
-            if (!targetPair) {
-                showNotification('请先选择机场对', 'error');
-                return;
-            }
-            
-            // 处理所有选中的文件
-            Array.from(files).forEach(file => {
-                processCSVFile(file, targetPair);
-            });
-            
-            // 清除文件输入
-            fileInput.value = '';
-        }
-        
-        // 处理CSV文件
-        function processCSVFile(file, targetPair) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    let content = e.target.result;
-                    
-                    // 检测并移除UTF-8 BOM
-                    if (content.charCodeAt(0) === 0xFEFF) {
-                        content = content.substring(1);
-                    }
-                    
-                    // 解析CSV
-                    const rows = parseCSV(content);
-                    if (rows.length < 2) {
-                        showNotification(`文件"${file.name}"为空或格式错误`, 'error');
-                        return;
-                    }
-                    
-                    // 获取表头
-                    const headers = rows[0];
-                    if (headers.length < 6) {
-                        showNotification(`文件"${file.name}"列数不足`, 'error');
-                        return;
-                    }
-                    
-                    // 确定是释压还是飘降数据
-                    const fileName = file.name.toLowerCase();
-                    const isRelease = fileName.includes('释压') || fileName.includes('release');
-                    const isDescend = fileName.includes('飘降') || fileName.includes('descend');
-                    const programType = isRelease ? 'release' : (isDescend ? 'descend' : null);
-                    
-                    if (!programType) {
-                        showNotification(`无法确定程序类型，请确认文件名包含"释压"或"飘降"`, 'error');
-                        return;
-                    }
-                    
-                    // 确保目标机场对存在
-                    if (!allData[targetPair]) {
-                        allData[targetPair] = {
-                            release: [],
-                            descend: [],
-                            selectedAlternates: new Set(),
-                            nextId: 1
-                        };
-                    }
-                    
-                    // 清空该程序类型下的旧数据
-                    allData[targetPair][programType] = [];
-                    
-                    // 解析数据行
-                    for (let i = 1; i < rows.length; i++) {
-                        const row = rows[i];
-                        if (row.length >= 6 && row[0]) { // 至少要有航段名称
-                            const newRow = {
-                                id: allData[targetPair].nextId++,
-                                segment: row[0] || `航段-${i}`,
-                                alternate1: row[1] || '',
-                                alternate2: row[2] || '',
-                                alternate3: row[3] || '',
-                                alternate4: row[4] || '',
-                                alternate5: row[5] || ''
-                            };
-                            allData[targetPair][programType].push(newRow);
-                        }
-                    }
-                    
-                    // 如果当前显示的就是这个机场对，刷新表格
-                    if (currentPair === targetPair) {
-                        renderTable();
-                        updateStats();
-                    }
-                    
-                    // 更新机场对列表显示
-                    renderPairsList();
-                    
-                    saveAllData();
-                    showNotification(`已导入${allData[targetPair][programType].length}条${programType === 'release' ? '释压' : '飘降'}数据到"${targetPair}"`);
-                    
-                } catch (error) {
-                    console.error('CSV解析错误:', error);
-                    showNotification(`文件"${file.name}"解析失败: ${error.message}`, 'error');
-                }
-            };
-            
-            reader.onerror = function() {
-                showNotification(`文件"${file.name}"读取失败`, 'error');
-            };
-            
-            reader.readAsText(file, 'UTF-8');
-        }
-        
-        // 解析CSV内容
-        function parseCSV(content) {
-            const rows = [];
-            let currentRow = [];
-            let currentCell = '';
-            let inQuotes = false;
-            
-            for (let i = 0; i < content.length; i++) {
-                const char = content[i];
-                const nextChar = content[i + 1];
-                
-                if (char === '"' && !inQuotes) {
-                    inQuotes = true;
-                } else if (char === '"' && inQuotes && nextChar === '"') {
-                    currentCell += '"';
-                    i++; // 跳过下一个引号
-                } else if (char === '"' && inQuotes) {
-                    inQuotes = false;
-                } else if (char === ',' && !inQuotes) {
-                    currentRow.push(currentCell.trim());
-                    currentCell = '';
-                } else if (char === '\n' && !inQuotes) {
-                    currentRow.push(currentCell.trim());
-                    rows.push(currentRow);
-                    currentRow = [];
-                    currentCell = '';
-                } else if (char === '\r' && nextChar === '\n' && !inQuotes) {
-                    currentRow.push(currentCell.trim());
-                    rows.push(currentRow);
-                    currentRow = [];
-                    currentCell = '';
-                    i++; // 跳过\n
-                } else {
-                    currentCell += char;
-                }
-            }
-            
-            // 添加最后一行
-            if (currentCell.trim() || currentRow.length > 0) {
-                currentRow.push(currentCell.trim());
-                rows.push(currentRow);
-            }
-            
-            return rows;
-        }
-        
-        // 下载释压模板
-        function downloadReleaseTemplate() {
-            const BOM = '\uFEFF';
-            const template = BOM + `航段,航路备降场1,航路备降场2,航路备降场3,航路备降场4,航路备降场5
-航段-01,PEK,SHA,CAN,SZX,XIY
-航段-02,PVG,CTU,KMG,URC,HRB
-航段-03,CAN,SZX,CTU,XIY,TAO`;
-            
-            const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(template);
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', 'NS释压模板.csv');
-            linkElement.click();
-            
-            showNotification('释压模板已下载');
-        }
-        
-        // 下载飘降模板
-        function downloadDescendTemplate() {
-            const BOM = '\uFEFF';
-            const template = BOM + `航段,航路备降场1,航路备降场2,航路备降场3,航路备降场4,航路备降场5
-航段-04,SZX,CTU,KMG,URC,HRB
-航段-05,CTU,PEK,SHA,CAN,SZX
-航段-06,XIY,CKG,KWE,WUH,CSX`;
-            
-            const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(template);
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', 'NS飘降模板.csv');
-            linkElement.click();
-            
-            showNotification('飘降模板已下载');
-        }
-        
-        // 下载完整模板
-        function downloadCombinedTemplate() {
-            const BOM = '\uFEFF';
-            const template = BOM + `航段,航路备降场1,航路备降场2,航路备降场3,航路备降场4,航路备降场5
-航段-01,PEK,SHA,CAN,SZX,XIY
-航段-02,PVG,CTU,KMG,URC,HRB
-航段-03,CAN,SZX,CTU,XIY,TAO
-航段-04,SZX,CTU,KMG,URC,HRB
-航段-05,CTU,PEK,SHA,CAN,SZX
-航段-06,XIY,CKG,KWE,WUH,CSX`;
-            
-            const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(template);
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', 'NS释压飘降完整模板.csv');
-            linkElement.click();
-            
-            showNotification('完整模板已下载');
-        }
-        
-        // 拖拽上传处理
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById('uploadArea').classList.add('drag-over');
-        }
-        
-        function handleDragLeave(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById('uploadArea').classList.remove('drag-over');
-        }
-        
-        function handleDrop(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById('uploadArea').classList.remove('drag-over');
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                document.getElementById('fileInput').files = files;
-                handleFileSelect();
-            }
-        }
-        
-        // 清空当前机场对数据
-        function clearCurrentPairData() {
-            // 检查密码验证状态
-            if (!passwordVerified) {
-                showNotification('请先验证密码以访问此功能', 'error');
-                return;
-            }
-            
-            if (!currentPair) {
-                showNotification('请先选择机场对', 'error');
-                return;
-            }
-            
-            if (!confirm(`确定要清空"${currentPair}"的所有数据吗？`)) {
-                return;
-            }
-            
-            if (allData[currentPair]) {
-                allData[currentPair].release = [];
-                allData[currentPair].descend = [];
-                allData[currentPair].selectedAlternates.clear();
-                selectedAlternates.clear();
-                allData[currentPair].nextId = 1;
-                
-                renderTable();
-                updateStats();
-                renderPairsList();
-                saveAllData();
-                showNotification(`已清空"${currentPair}"的数据`);
-            }
-        }
-        
-        // 清空所有机场对数据
-        function clearAllData() {
-            // 检查密码验证状态
-            if (!passwordVerified) {
-                showNotification('请先验证密码以访问此功能', 'error');
-                return;
-            }
-            
-            if (!confirm('确定要清空所有机场对的数据吗？此操作不可撤销。')) {
-                return;
-            }
-            
-            Object.keys(allData).forEach(pair => {
-                allData[pair].release = [];
-                allData[pair].descend = [];
-                allData[pair].selectedAlternates.clear();
-                allData[pair].nextId = 1;
-            });
-            
-            if (currentPair && allData[currentPair]) {
-                selectedAlternates.clear();
-            }
-            
-            renderTable();
-            updateStats();
-            renderPairsList();
-            saveAllData();
-            showNotification('已清空所有数据');
-        }
-        
-        // 清除所有高亮
-        function clearAllHighlights() {
-            if (currentPair && allData[currentPair]) {
-                allData[currentPair].selectedAlternates.clear();
-                selectedAlternates.clear();
-                
-                renderTable();
-                updateStats();
-                saveAllData();
-                showNotification('已清除所有高亮');
-            }
-        }
-        
-        // 加载所有示例数据
-        function loadAllSampleData() {
-            // 检查密码验证状态
-            if (!passwordVerified) {
-                showNotification('请先验证密码以访问此功能', 'error');
-                return;
-            }
-            
-            airportPairs.forEach(pair => {
-                loadPairSampleData(pair);
-            });
-            
-            if (currentPair && allData[currentPair]) {
-                selectedAlternates = allData[currentPair].selectedAlternates || new Set();
-                renderTable();
-                updateStats();
-            }
-            
-            renderPairsList();
-            saveAllData();
-            showNotification('已加载所有示例数据');
-        }
-        
-        // 保存所有数据到本地存储（自动保存，用户无需手动操作）
-        function saveAllData() {
-            const saveData = {
-                airportPairs: airportPairs,
-                allData: {},
-                currentPair: currentPair
-            };
-            
-            // 转换Set为数组以便存储
-            Object.keys(allData).forEach(pair => {
-                saveData.allData[pair] = {
-                    release: allData[pair].release,
-                    descend: allData[pair].descend,
-                    selectedAlternates: Array.from(allData[pair].selectedAlternates || []),
-                    nextId: allData[pair].nextId
-                };
-            });
-            
-            localStorage.setItem('nsAllData', JSON.stringify(saveData));
-        }
-        
-        // 从本地存储加载所有数据
-        function loadAllData() {
-            const savedData = localStorage.getItem('nsAllData');
-            if (savedData) {
-                try {
-                    const data = JSON.parse(savedData);
-                    airportPairs = data.airportPairs || [];
-                    currentPair = data.currentPair || (airportPairs.length > 0 ? airportPairs[0] : null);
-                    
-                    // 恢复数据，转换数组为Set
-                    allData = {};
-                    if (data.allData) {
-                        Object.keys(data.allData).forEach(pair => {
-                            allData[pair] = {
-                                release: data.allData[pair].release || [],
-                                descend: data.allData[pair].descend || [],
-                                selectedAlternates: new Set(data.allData[pair].selectedAlternates || []),
-                                nextId: data.allData[pair].nextId || 1
-                            };
-                        });
-                    }
-                    
-                    if (currentPair && allData[currentPair]) {
-                        selectedAlternates = allData[currentPair].selectedAlternates || new Set();
-                    }
-                    
-                    return true;
-                } catch (e) {
-                    console.error('加载保存的数据时出错:', e);
-                }
-            }
-            return false;
-        }
-        
-        // 显示通知
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const messageElement = document.getElementById('notificationMessage');
-            
-            messageElement.textContent = message;
-            notification.style.backgroundColor = type === 'error' ? '#e53e3e' : '#38a169';
-            
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-        
-        // 切换折叠区域
-        function toggleCollapse(id) {
-            const content = document.getElementById(id);
-            const icon = document.getElementById('collapseIcon');
-            
-            content.classList.toggle('active');
-            icon.textContent = content.classList.contains('active') ? '▲' : '▼';
-        }
-        
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 点击上传区域触发文件选择
-            document.getElementById('uploadArea').addEventListener('click', function(e) {
-                if (e.target.type !== 'file') {
-                    document.getElementById('fileInput').click();
-                }
-            });
-            
-            // 检查密码验证状态
-            checkPasswordFromStorage();
-            
-            // 尝试从本地存储加载
-            if (!loadAllData()) {
-                // 如果没有保存的数据，加载示例数据
-                initSampleData();
-            } else {
-                renderAirportPairs();
-                if (currentPair) {
-                    renderTable();
-                    updateStats();
-                }
-            }
-            
-            // 为密码输入框添加回车键支持
-            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    checkPassword();
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+                { id: 1, segment: `${
